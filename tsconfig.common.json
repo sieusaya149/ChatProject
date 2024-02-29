@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "moduleResolution": "node",
+      "allowJs": true,
+      "noImplicitAny": false,
+      "esModuleInterop": true,
+      "strictNullChecks": false,
+      "useUnknownInCatchVariables": false,
+      "module": "commonjs",
+      "skipLibCheck": true,
+      "declaration": true,
+      "declarationMap": true,
+      "sourceMap": true,
+      "importHelpers": true,
+      "composite": true,
+      "lib": ["ES2021"],
+      "target": "ES2021",
+      "types": ["node", "express"],
+      "resolveJsonModule": true
+    },
+    "exclude": ["node_modules", "build"]
+}
