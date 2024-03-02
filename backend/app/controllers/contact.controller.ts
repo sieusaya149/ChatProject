@@ -49,6 +49,18 @@ class ContactController {
         );
         return successRes.send(res);
     }
+
+    static searchContact = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Search contact success!',
+            await ContactService.searchContact(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default ContactController;

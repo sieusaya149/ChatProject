@@ -15,14 +15,17 @@ contactRoute.get(
 );
 
 contactRoute.put(
-    '/edit-contact',
+    '/contact',
     asyncHandler(ContactController.updateContactList)
 );
 
 contactRoute.delete(
-    '/delete-contact',
+    '/contact',
     asyncHandler(ContactController.deleteContact)
 );
 
-
+contactRoute.get(
+    '/contacts/search',
+    asyncHandler(ContactController.searchContact)
+);
 export default contactRoute;

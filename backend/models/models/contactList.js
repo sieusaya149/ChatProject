@@ -4,8 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     const ContactList = sequelize.define('ContactLists', {
         id: {
             type: DataTypes.UUID,
-            defaultValue: uuidv4(),
             primaryKey: true,
+            defaultValue: DataTypes.UUIDV4,
         },
         userId: {
             type: DataTypes.UUID,

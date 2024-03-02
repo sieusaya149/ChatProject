@@ -63,4 +63,17 @@ export class ContactService {
             throw new BadRequestError(`${error}`);
         }
     }
+
+    static searchContact = async (req: Request, res: Response) => {
+        try {
+            const userId = req.body.userId;
+            const keyword = req.query.keyword;
+            const contactList = await ContactListRepo.searchContact(userId, keyword as string);
+            return {
+                contactList
+            }
+        } catch (error) {
+            throw new NotFoundError(`${error}`);
+        }
+    }
 }

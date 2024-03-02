@@ -13,6 +13,7 @@ export class UserRepo {
       Logger.info(`User ${user.id} has been created`);
       return user;
     } catch (error) {
+      console.log(error);
       throw new Error(`${error}`);
     }
   } 

@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
         id: {
             type: DataTypes.UUID,
             primaryKey: true,
-            defaultValue: uuidv4(),
+            defaultValue: DataTypes.UUIDV4
         },
         lastName: {
             type: DataTypes.STRING,
@@ -42,6 +42,7 @@ module.exports = (sequelize, DataTypes) => {
         accountId:{
             type: DataTypes.UUID,
             allowNull: false,
+            unique: true,
         },
         regionPhoneCodeId: {
             type: DataTypes.UUID,

@@ -1,7 +1,8 @@
 import { ContactListDto, ContactListUpdateDto } from "./contactListDto";
-
+import { Op } from "sequelize";
 import backendModel from "@viethung/backend-models";
 const ContactLists = backendModel.ContactLists;
+import {Sequelize} from 'sequelize';
 
 export class ContactListRepo {
   static async addContact(newContact: ContactListDto) {
@@ -18,8 +19,8 @@ export class ContactListRepo {
       const contactList = await ContactLists.findAll({
         where: {userId},
         include: {
-            model: backendModel.Users,
-            as: 'contact',
+          model: backendModel.Users,
+          as: 'contact'
         }
     });
       return contactList;
@@ -52,6 +53,31 @@ export class ContactListRepo {
       }
       await contact.destroy();
       return contact;
+    } catch (error) {
+      throw new Error(`${error}`);
+    }
+  }
+
+  static async searchContact(userId: string, keyword: string) {
+    try {
+      const contactList = await ContactLists.findAll({
+        where: {
+          userId,
+        },
+        include: { 
+          model: backendModel.Users,
+          as: 'contact',
+          where: {
+            [Op.or]: [
+              {firstName: {[Op.iLike]: `%${keyword}%`}},
+              {lastName: {[Op.iLike]: `%${keyword}%`}}
+            ]
+          },
+          attributes: ['id', 'firstName', 'lastName']
+        },
+        attributes: ['block', 'blockExpires']
+      });
+      return contactList;
     } catch (error) {
       throw new Error(`${error}`);
     }

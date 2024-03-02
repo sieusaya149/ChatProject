@@ -1,10 +1,9 @@
-import { v4 as uuidv4 } from 'uuid';
 
 module.exports = (sequelize, DataTypes) => {
     const RegionPhoneCode = sequelize.define('RegionPhoneCodes', {
         id: {
             type: DataTypes.UUID,
-            defaultValue: () => uuidv4(),
+            defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
         },
         name: {
