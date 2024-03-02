@@ -51,6 +51,18 @@ class UserController {
         );
         return successRes.send(res);
     }
+
+    static getUserList = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get User List Success!',
+            await UserService.getUserList(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default UserController;

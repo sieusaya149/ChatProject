@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 module.exports = (sequelize, DataTypes) => {
-    const ContactList = sequelize.define('contactList', {
+    const ContactList = sequelize.define('ContactLists', {
         id: {
             type: DataTypes.UUID,
             defaultValue: uuidv4(),

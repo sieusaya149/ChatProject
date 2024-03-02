@@ -13,6 +13,7 @@ import {
 } from '@viethung/api-response'
 import {UserRepo} from '../db/repositories/userRepo';
 import { UserDto } from '../db/repositories/userDto';
+import { pick } from 'lodash';
 export class UserService {
 
     static createUser = async (req: Request, res: Response) => {
@@ -63,4 +64,19 @@ export class UserService {
             throw new BadRequestError(`${error}`);
         }
     }
+
+    static getUserList = async (req: Request, res: Response) => {
+        try {
+            const userList = await UserRepo.getUserList();
+            const users = userList.map( user => {
+                return pick(user, ['id', 'firstName', 'lastName' , 'phone'])
+            });
+            return {
+                users
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
 }
+

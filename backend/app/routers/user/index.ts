@@ -31,6 +31,11 @@ userRoute.delete(
     asyncHandler(UserController.deleteUser)
 );
 
+userRoute.get(
+    '/users',
+    asyncHandler(UserController.getUserList)
+);
+
 
 
 export default userRoute;

@@ -54,4 +54,13 @@ export class UserRepo {
       throw new Error(`${error}`);
     }
   }
+
+  static async getUserList() {  
+    try {
+      const userList = await Users.findAll();
+      return userList;
+    } catch (error) {
+      throw new Error(`${error}`);
+    }
+  }
 }
