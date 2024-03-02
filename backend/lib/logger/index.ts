@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import DailyRotateFile from 'winston-daily-rotate-file';
 // import {environment, logDirectory} from '../../config';
-const logDirectory = '../../logs'
+const logDirectory = '../../../logs'
 const environment = 'development'
 let dir = logDirectory;
 // create a path for creating

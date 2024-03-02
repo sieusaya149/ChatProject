@@ -7,5 +7,7 @@
 **/build/
 .vscode/
 **/logs/
+./yarn.lock
+./setup.md
+**/data/
 yarn.lock
-setup.md

@@ -11,13 +11,56 @@ import {
     NoDataError,
     AccessTokenError
 } from '@viethung/api-response'
-import Logger from '@viethung/logger'
+import {UserRepo} from '../db/repositories/userRepo';
+import { UserDto } from '../db/repositories/userDto';
 export class UserService {
-    static getUserProfile = async (req: Request, res: Response) => {
+
+    static createUser = async (req: Request, res: Response) => {
         try {
-            return {}
+            const newUser: UserDto = req.body;
+            const insertedUser = await UserRepo.createUser(newUser);
+            return {
+                insertedUser
+            }
         } catch (error) {
             throw new BadRequestError(`${error}`);
         }
-    };
+    }
+
+    static getUserProfile = async (req: Request, res: Response) => {    
+        try {
+            const userId = req.params.userId;
+            const user = await UserRepo.getUser(userId);
+            return {
+                user
+            }
+        } catch (error) {
+            throw new NotFoundError(`${error}`);
+        }
+    }
+
+    static updateUser = async (req: Request, res: Response) => {
+        try {
+            const userId = req.params.userId;
+            const updatedUser: UserDto = req.body;
+            const user = await UserRepo.updateUser(userId, updatedUser);
+            return {
+                user
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static deleteUser = async (req: Request, res: Response) => {
+        try {
+            const userId = req.params.userId;
+            const user = await UserRepo.deleteUser(userId);
+            return {
+                user
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
 }
