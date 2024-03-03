@@ -10,4 +10,5 @@
 ./yarn.lock
 ./setup.md
 **/data/
+**/data2/
 yarn.lock
