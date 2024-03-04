@@ -6,68 +6,64 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4
         },
         isCreator: {
-          type: Sequelize.BOOLEAN,
+          type: DataTypes.BOOLEAN,
           allowNull: false,
           defaultValue: false
         },
         isAdmin: {
-          type: Sequelize.BOOLEAN,
+          type: DataTypes.BOOLEAN,
           allowNull: false,
           defaultValue: false
         },
         joinedDate: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         },
         nickName: {
-          type: Sequelize.STRING,
+          type: DataTypes.STRING,
           allowNull: true
         },
         lastViewedMessage: {
-          type: Sequelize.INTEGER,
+          type: DataTypes.INTEGER,
           allowNull: true
         },
-        accessConversationKey: {
-          type: Sequelize.STRING,
-          allowNull: false
-        },
         isBlocked: {
-          type: Sequelize.BOOLEAN,
+          type: DataTypes.BOOLEAN,
           allowNull: false,
           defaultValue: false
         },
         blockExpires: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: true,
           defaultValue: null
         },
         userId: {
-          type: Sequelize.UUID,
+          type: DataTypes.UUID,
           allowNull: false
         },
         conversationId: {
-          type: Sequelize.UUID,
+          type: DataTypes.UUID,
           allowNull: false
         },
         muteNotifications: {
-          type: Sequelize.BOOLEAN,
+          type: DataTypes.BOOLEAN,
           allowNull: false,
           defaultValue: false
         },
         muteNotificationsExpire: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: true
         },
         createdAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         },
         updatedAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         }
     });
     Participants.associate = models => {
@@ -76,4 +72,5 @@ module.exports = (sequelize, DataTypes) => {
             as: 'conversation',
         });
     };
+    return Participants;
 }

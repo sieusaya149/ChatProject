@@ -6,22 +6,22 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4
         },
         messageId: {
-          type: Sequelize.UUID,
+          type: DataTypes.UUID,
           allowNull: false
         },
         remainingTime:{
-            type: Sequelize.DATE,
+            type: DataTypes.DATE,
             allowNull: false
         },
         createdAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         },
         updatedAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         }
     });
     DeletedMessages.associate = models => {
@@ -30,4 +30,5 @@ module.exports = (sequelize, DataTypes) => {
             as: 'deletedMessage',
         });
     };
+    return DeletedMessages;
 }

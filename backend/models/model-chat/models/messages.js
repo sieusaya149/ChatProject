@@ -35,14 +35,14 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         createdAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         },
         updatedAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         }
     });
     Messages.associate = models => {
@@ -66,4 +66,5 @@ module.exports = (sequelize, DataTypes) => {
             as: 'deletedMessage',
         });
     };
+    return Messages;
 }

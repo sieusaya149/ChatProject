@@ -28,34 +28,29 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true
         },
         createdAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         },
         updatedAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         }
     });
     Conversations.associate = models => {
-        Conversations.hasMany(models.Conversations, {
+        Conversations.hasMany(models.Participants, {
             foreignKey: 'conversationId',
             as: 'participants',
         });
-    };
-
-    Conversations.associate = models => {
         Conversations.hasMany(models.Messages, {
             foreignKey: 'conversationId',
             as: 'messages',
         });
-    };
-
-    Conversations.associate = models => {
         Conversations.hasMany(models.DeletedConversations, {
             foreignKey: 'conversationId',
             as: 'deletedConversations',
         });
     };
+    return Conversations;
 }

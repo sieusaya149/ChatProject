@@ -6,30 +6,30 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4
         },
         name: {
-            type: DataTypes.String,
+            type: DataTypes.STRING,
             allowNull: false
         },
         url: {
-          type: Sequelize.String,
+          type: DataTypes.STRING,
           allowNull: false
         },
         userId: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             allowNull: false
         },
         messageId: {
-            type: Sequelize.UUID,
+            type: DataTypes.UUID,
             allowNull: false
         },
         createdAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         },
         updatedAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         }
     });
     Emotions.associate = models => {
@@ -38,4 +38,5 @@ module.exports = (sequelize, DataTypes) => {
             as: 'messageEmotion',
         });
     };
+    return Emotions;
 }

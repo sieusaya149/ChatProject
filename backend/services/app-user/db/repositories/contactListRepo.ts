@@ -1,6 +1,6 @@
 import { ContactListDto, ContactListUpdateDto } from "./contactListDto";
 import { Op } from "sequelize";
-import backendModel from "@viethung/backend-models";
+import backendModel from "@viethung/backend-models-user";
 const ContactLists = backendModel.ContactLists;
 import {Sequelize} from 'sequelize';
 

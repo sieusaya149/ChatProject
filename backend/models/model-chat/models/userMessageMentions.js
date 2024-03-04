@@ -10,18 +10,18 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         userId: {
-          type: Sequelize.UUID,
+          type: DataTypes.UUID,
           allowNull: false
         },
         createdAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         },
         updatedAt: {
-          type: Sequelize.DATE,
+          type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.NOW
+          defaultValue: DataTypes.NOW
         }
     });
     UserMessageMentions.associate = models => {
@@ -30,4 +30,5 @@ module.exports = (sequelize, DataTypes) => {
             as: 'messageMention',
         });
     };
+    return UserMessageMentions;
 }

@@ -1,5 +1,5 @@
 {
-	"name": "@viethung/backend-models",
+	"name": "@viethung/backend-models-user",
 	"version": "1.0.0",
 	"main": "server.js",
 	"license": "MIT",

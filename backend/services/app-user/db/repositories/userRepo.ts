@@ -1,6 +1,5 @@
 import sequelize from "../sequelizeConnection";
-import Sequelize from 'sequelize';
-import backendModel from "@viethung/backend-models";
+import backendModel from "@viethung/backend-models-user";
 import { UserDto, UserUpdateDto } from "./userDto";
 import Logger from "@viethung/logger";
 const Users = backendModel.Users;
