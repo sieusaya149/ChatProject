@@ -1,22 +1,30 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.sequelize.query(`
+      CREATE OR REPLACE FUNCTION update_block_expires_and_mute_notifications_expire() RETURNS TRIGGER AS $$
+      BEGIN
+        IF NEW.isBlocked = false THEN
+          NEW.blockExpires = null;
+        END IF;
+        IF NEW.muteNotifications = false THEN
+          NEW.muteNotificationsExpire = null;
+        END IF;
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+
+      CREATE TRIGGER update_block_expires_and_mute_notifications_expire
+      BEFORE UPDATE ON "Participants"
+      FOR EACH ROW EXECUTE PROCEDURE update_block_expires_and_mute_notifications_expire();
+    `);
   },
 
-  async down (queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.sequelize.query(`
+      DROP TRIGGER update_block_expires_and_mute_notifications_expire ON "Participants";
+      DROP FUNCTION update_block_expires_and_mute_notifications_expire();
+    `);
   }
 };

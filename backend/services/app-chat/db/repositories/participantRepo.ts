@@ -29,6 +29,21 @@ export class ParticipantRepo {
         throw new Error(`${error}`);
         }
     }
+
+    static async getParticipantByConversation(userId: string,
+                                              conversationId: string) {
+        try {
+        const participant = await Participants.findOne({
+            where: {
+                userId: userId,
+                conversationId: conversationId
+            }
+        });
+        return participant;
+        } catch (error) {
+        throw new Error(`${error}`);
+        }
+    }
     
     static async updateParticipant(participantId: string, updatedParticipant: updateParticipantDto) {    
         try {
@@ -56,17 +71,23 @@ export class ParticipantRepo {
         }
     }
 
-    static async addParticipantToConversation(conversationId: string, userId: string, isCreator : boolean = false) {
+    static async addParticipantToConversation(
+        conversationId: string,
+        userId: string,
+        isCreator : boolean = false,
+        isAdmin: boolean = false) {
         try {
             const participant = await Participants.create({
                 conversationId,
                 userId,
-                isCreator
+                isCreator,
+                isAdmin
             });
             return participant;
         } catch (error) {
             throw new Error(`${error}`);
         }
     }
+
 
 } 
