@@ -10,10 +10,12 @@ export type participantDto = {
     blockExpires?: Date;
     userId: string;
     conversationId: string;
+    viewFromDate?: Date;
+    conversationSettingId: string;
     muteNotification?: boolean;
     muteNOtificationExpire?: Date;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
-export type updateParticipantDto = Optional<participantDto, 'userId'| 'conversationId'>; 
+export type updateParticipantDto = Optional<participantDto, 'userId'| 'conversationId' | 'conversationSettingId' | 'viewFromDate'>; 

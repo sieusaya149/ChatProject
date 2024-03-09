@@ -46,14 +46,14 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.UUID,
           allowNull: false
         },
-        muteNotifications: {
-          type: DataTypes.BOOLEAN,
-          allowNull: false,
-          defaultValue: false
+        conversationSettingId: {
+          type: DataTypes.UUID,
+          allowNull: false
         },
-        muteNotificationsExpire: {
+        viewFromDate: {
           type: DataTypes.DATE,
-          allowNull: true
+          allowNull: true,
+          defaultValue: null
         },
         createdAt: {
           type: DataTypes.DATE,
@@ -70,6 +70,10 @@ module.exports = (sequelize, DataTypes) => {
         Participants.belongsTo(models.Conversations, {
             foreignKey: 'conversationId',
             as: 'conversation',
+        });
+        Participants.belongsTo(models.ConversationSettings, {
+          foreignKey: 'conversationSettingId',
+          as: 'conversationSetting',
         });
     };
     return Participants;

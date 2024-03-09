@@ -74,15 +74,18 @@ export class ParticipantRepo {
     static async addParticipantToConversation(
         conversationId: string,
         userId: string,
+        conversationSettingId: string,
         isCreator : boolean = false,
         isAdmin: boolean = false) {
         try {
-            const participant = await Participants.create({
+            const participantData = {
                 conversationId,
                 userId,
                 isCreator,
-                isAdmin
-            });
+                isAdmin,
+                conversationSettingId,
+            } as participantDto
+            const participant = await Participants.create(participantData);
             return participant;
         } catch (error) {
             throw new Error(`${error}`);
