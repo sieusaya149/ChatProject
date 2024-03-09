@@ -19,7 +19,7 @@ contactRoute.put(
 );
 
 contactRoute.put(
-    '/conversation/user-block/:conversationId',
+    '/conversation/admin-block-group/:conversationId',
     asyncHandler(ConversationController.userBlockConversation)
 );
 
@@ -29,7 +29,7 @@ contactRoute.put(
 );
 
 contactRoute.put(
-    '/conversation/user-unblock/:conversationId',
+    '/conversation/admin-unblock-group/:conversationId',
     asyncHandler(ConversationController.userUnblockConversation)
 );
 
@@ -39,17 +39,17 @@ contactRoute.put(
 );
 
 contactRoute.put(
-    '/conversation/update-admin:conversationId',
+    '/conversation/change-admin-group/:conversationId',
     asyncHandler(ConversationController.updateAdminConversation)
 );
 
 contactRoute.put(
-    '/conversation/add-participant/:conversationId',
+    '/conversation/add-participant-group/:conversationId',
     asyncHandler(ConversationController.addParticipant)
 );
 
 contactRoute.delete(
-    '/conversation/admin-delete/:conversationId',
+    '/conversation/admin-delete-group/:conversationId',
     asyncHandler(ConversationController.adminDeleteConversation)
 );
 
