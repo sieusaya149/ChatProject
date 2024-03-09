@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             defaultValue: DataTypes.UUIDV4
         },
+        name: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         description: {
             type: DataTypes.STRING,
             allowNull: true
@@ -25,6 +29,14 @@ module.exports = (sequelize, DataTypes) => {
         },
         blockExpires: {
             type: DataTypes.DATE,
+            allowNull: true
+        },
+        backgroundUrlId: {
+            type: DataTypes.UUID,
+            allowNull: true
+        },
+        joinCode: {
+            type: DataTypes.STRING,
             allowNull: true
         },
         createdAt: {
