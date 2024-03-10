@@ -320,4 +320,53 @@ export class ConversationService {
             throw new BadRequestError(`${error}`);
         }
     }
+
+    static blockParticipant = async (req: Request, res: Response) => {
+        try {
+            const conversationId = req.params.conversationId;
+            const userId = req.body.userId;
+            const executorId = req.body.executorId;
+            const blockExpires = req.body.blockExpires;
+            if(conversationId == null || userId == null || executorId == null || blockExpires == null)
+            {
+                throw new BadRequestError(`conversationId, userId, blockExpires and executorId are required`);
+            }
+            if(userId == executorId)
+            {
+                throw new BadRequestError(`You can't block yourself`);
+            }
+            const conversationMng = new ConversationManagement(conversationId, executorId);
+            await conversationMng.evaluateConversationData()
+            const conversationUpdated = await conversationMng.blockParticipant(userId, blockExpires);
+            return {
+                conversationUpdated
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static unblockParticipant = async (req: Request, res: Response) => {
+        try {
+            const conversationId = req.params.conversationId;
+            const userId = req.body.userId;
+            const executorId = req.body.executorId;
+            if(conversationId == null || userId == null || executorId == null)
+            {
+                throw new BadRequestError(`conversationId, userId and executorId are required`);
+            }
+            if(userId == executorId)
+            {
+                throw new BadRequestError(`You can't unblock yourself`);
+            }
+            const conversationMng = new ConversationManagement(conversationId, executorId);
+            await conversationMng.evaluateConversationData()
+            const conversationUpdated = await conversationMng.unblockParticipant(userId);
+            return {
+                conversationUpdated
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
 }

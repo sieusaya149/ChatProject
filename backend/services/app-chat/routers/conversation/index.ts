@@ -67,5 +67,15 @@ contactRoute.post(
     asyncHandler(ConversationController.leaveConversation)
 );
 
+contactRoute.put(
+    '/conversation/block-participant/:conversationId',
+    asyncHandler(ConversationController.blockParticipant)
+)
+
+contactRoute.put(
+    '/conversation/unblock-participant/:conversationId',
+    asyncHandler(ConversationController.unblockParticipant)
+)
+
 
 export default contactRoute;

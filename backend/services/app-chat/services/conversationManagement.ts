@@ -281,5 +281,62 @@ export default class ConversationManagement {
         await participant.destroy();
         return await this.getConversationDetail();
     }
+
+    async blockParticipant(userId: string, blockExpires: Date) {
+        // if conversation type is GROUP, only admin can block member
+        if(this.conversationData.type === 'GROUP') {
+            const isAdmin = await this.checkIfUserIsAdmin();
+            if (!isAdmin) {
+                throw new Error(`You are not an admin`);
+            }
+        }
+        
+        if(! await this.checkIfUserIsJoined(userId)) {
+            throw new Error(`The user is not in the conversation`);
+        }
+        const blockExpiresDate = new Date(blockExpires);
+        if (isNaN(blockExpiresDate.getTime())) {
+            throw new Error(`blockExpires is not a valid date`);
+        }
+        if(blockExpiresDate <= new Date())
+        {
+            throw new Error(`blockExpires must be in the future`);
+        }
+        const participant = await ParticipantRepo.getParticipantByConversation(
+            userId,
+            this.conversationId);
+        const updatedParticipant = {
+            isBlocked: true,
+            blockExpires: blockExpires
+        } as updateParticipantDto;
+        await participant.update(updatedParticipant);
+        return await this.getConversationDetail();
+    }
+
+    async unblockParticipant(userId: string) {
+        // if conversation type is GROUP, only admin can unblock member
+        if(this.conversationData.type === 'GROUP') {
+            const isAdmin = await this.checkIfUserIsAdmin();
+            if (!isAdmin) {
+                throw new Error(`You are not an admin`);
+            }
+        }
+        if(! await this.checkIfUserIsJoined(userId)) {
+            throw new Error(`The user is not in the conversation`);
+        }
+        const participant = await ParticipantRepo.getParticipantByConversation(
+            userId,
+            this.conversationId);
+        // check if the user is block or not
+        if(!participant.isBlocked) {
+            throw new Error(`The user is not blocked`);
+        }
+        const updatedParticipant = {
+            isBlocked: false,
+            blockExpires: null
+        } as updateParticipantDto;
+        await participant.update(updatedParticipant);
+        return await this.getConversationDetail();
+    }
 }
 

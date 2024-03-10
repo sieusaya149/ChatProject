@@ -159,6 +159,29 @@ class ConversationController {
         return successRes.send(res);
     }
     
+    static blockParticipant = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Block Member Success!',
+            await ConversationService.blockParticipant(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static unblockParticipant = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Unblock Member Success!',
+            await ConversationService.unblockParticipant(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default ConversationController;
