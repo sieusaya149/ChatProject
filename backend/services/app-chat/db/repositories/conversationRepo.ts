@@ -74,4 +74,47 @@ export class ConversationRepo {
       throw new Error(`${error}`);
     }
   }
+
+  static async getConversationByUserId(userId: string, limit = null, page = null) {
+    try {
+      const options = {
+        include: {
+          model: backendModel.Participants,
+          as: 'participants',
+          where: {
+            userId: userId
+          }
+        }
+      };
+  
+      if (limit !== null && page !== null) {
+        console.log('limit', limit);
+        console.log('page', page);
+        options['limit'] = limit;
+        options['offset'] = limit * (page - 1);
+      }
+  
+      const conversation = await Conversations.findAll(options);
+  
+      // get number of conversation
+      const totalConversation = await Conversations.count({
+        include: {
+          model: backendModel.Participants,
+          as: 'participants',
+          where: {
+            userId: userId
+          }
+        }
+      });
+  
+      return {
+        totalConversation,
+        currentPage: page,
+        totalPage: Math.ceil(totalConversation / limit),
+        conversation
+      };
+    } catch (error) {
+      throw new Error(`${error}`);
+    }
+  }
 } 

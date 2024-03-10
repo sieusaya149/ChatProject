@@ -13,6 +13,10 @@ contactRoute.get(
     asyncHandler(ConversationController.getConversation)
 );
 
+contactRoute.get(
+    '/conversations/:userId',
+    asyncHandler(ConversationController.getConversations)
+);
 contactRoute.put(
     '/conversation/:conversationId',
     asyncHandler(ConversationController.updateConversation)

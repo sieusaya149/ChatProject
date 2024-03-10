@@ -285,4 +285,39 @@ export class ConversationService {
             throw new BadRequestError(`${error}`);
         }
     }
+
+    static getConversations = async (req: Request, res: Response) => {
+        try {
+            const userId = req.params.userId;
+            const {limit, page} = req.body;
+
+            if(userId == null)
+            {
+                throw new BadRequestError(`userId is required`);
+            }
+            // if has limit need page
+            if(limit && page == null)
+            {
+                throw new BadRequestError(`page is required`);
+            }
+            // if has page need limit
+            if(page && limit == null)
+            {
+                throw new BadRequestError(`limit is required`);
+            }
+
+            if ((isNaN(limit) || isNaN(page))) {
+                throw new BadRequestError(`Limit and page must be a number`);
+            }
+            if (limit < 1 || page < 1) {
+                throw new BadRequestError(`Limit and page must be greater than 0`);
+            }
+            const conversationList = await ConversationRepo.getConversationByUserId(userId, limit, page);
+            return {
+                conversationList
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
 }

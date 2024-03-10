@@ -146,6 +146,18 @@ class ConversationController {
         );
         return successRes.send(res);
     }
+
+    static getConversations = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Conversations Success!',
+            await ConversationService.getConversations(req, res)
+        );
+        return successRes.send(res);
+    }
     
 }
 
