@@ -39,14 +39,14 @@ class ConversationController {
         return successRes.send(res);
     }
 
-    static userBlockConversation = async (
+    static adminBlockConversation = async (
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<Response> => {
         const successRes = new SuccessResponse(
             'User Block Conversation Success!',
-            await ConversationService.userBlockConversation(req, res)
+            await ConversationService.adminBlockConversation(req, res)
         );
         return successRes.send(res);
     }
@@ -63,14 +63,14 @@ class ConversationController {
         return successRes.send(res);
     }
 
-    static userUnblockConversation = async (
+    static adminUnblockConversation = async (
         req: Request,
         res: Response,
         next: NextFunction
     ): Promise<Response> => {
         const successRes = new SuccessResponse(
             'User Unblock Conversation Success!',
-            await ConversationService.userUnblockConversation(req, res)
+            await ConversationService.adminUnblockConversation(req, res)
         );
         return successRes.send(res);
     }
@@ -119,6 +119,30 @@ class ConversationController {
         const successRes = new SuccessResponse(
             'Add Participant Success!',
             await ConversationService.addParticipant(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static kickMember = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Kick Member Success!',
+            await ConversationService.kickMember(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static leaveConversation = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Leave Conversation Success!',
+            await ConversationService.leaveConversation(req, res)
         );
         return successRes.send(res);
     }

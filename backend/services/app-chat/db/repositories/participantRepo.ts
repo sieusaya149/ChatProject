@@ -13,7 +13,6 @@ export class ParticipantRepo {
         Logger.info(`Participant ${participant.id} has been created`);
         return participant;
         } catch (error) {
-        console.log(error);
         throw new Error(`${error}`);
         }
     }
@@ -45,9 +44,16 @@ export class ParticipantRepo {
         }
     }
     
-    static async updateParticipant(userId: string, updatedParticipant: updateParticipantDto) {    
+    static async updateParticipant(
+        userId: string,
+        conversationId: string,
+        updatedParticipant: updateParticipantDto) {    
         try {
-        const participant = await Participants.findOne({where: {userId: userId}});
+        const participant = await Participants.findOne({
+            where: {
+                userId: userId,
+                conversationId: conversationId
+            }});
         await participant.update(updatedParticipant);
         return participant;
         } catch (error) {

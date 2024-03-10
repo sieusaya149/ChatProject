@@ -20,7 +20,7 @@ contactRoute.put(
 
 contactRoute.put(
     '/conversation/admin-block-group/:conversationId',
-    asyncHandler(ConversationController.userBlockConversation)
+    asyncHandler(ConversationController.adminBlockConversation)
 );
 
 contactRoute.put(
@@ -30,7 +30,7 @@ contactRoute.put(
 
 contactRoute.put(
     '/conversation/admin-unblock-group/:conversationId',
-    asyncHandler(ConversationController.userUnblockConversation)
+    asyncHandler(ConversationController.adminUnblockConversation)
 );
 
 contactRoute.put(
@@ -53,6 +53,15 @@ contactRoute.delete(
     asyncHandler(ConversationController.adminDeleteConversation)
 );
 
+contactRoute.post(
+    '/conversation/kick-member/:conversationId',
+    asyncHandler(ConversationController.kickMember)
+);
+
+contactRoute.post(
+    '/conversation/leave-conversation/:conversationId',
+    asyncHandler(ConversationController.leaveConversation)
+);
 
 
 export default contactRoute;

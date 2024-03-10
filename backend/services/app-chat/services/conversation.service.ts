@@ -16,6 +16,7 @@ import { ParticipantRepo } from '../db/repositories/participantRepo';
 import { ConversationSettingRepo } from '../db/repositories/conversationSettingRepo';
 import { ConversationDto, updateConversationDto } from '../db/dto-models/conversationDto';
 import { ConversationSettingDto, updateConversationSettingDto } from '../db/dto-models/conversationSettingDto';
+import ConversationManagement from './conversationManagement';
 
 export class ConversationService {
     static createConversation = async (req: Request, res: Response) => {
@@ -69,12 +70,18 @@ export class ConversationService {
     static getConversation = async (req: Request, res: Response) => {  
         try {
             const conversationId = req.params.conversationId;
-            const conversation = await ConversationRepo.getDetailConversation(conversationId);
-            if (!conversation) {
-                throw new NoEntryError(`Conversation not found`);
+            const userId = req.body.userId;
+            if(conversationId == null){
+                throw new BadRequestError(`conversationId is required`);
             }
+            if(userId == null){
+                throw new BadRequestError(`userId is required`);
+            }
+            const conversationMng = new ConversationManagement(conversationId, userId);
+            await conversationMng.evaluateConversationData()
+            const conversationData = await conversationMng.getConversationDetail();
             return {
-                conversation
+                conversationData
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
@@ -84,74 +91,38 @@ export class ConversationService {
     static updateConversation = async (req: Request, res: Response) => {
         try {
             const conversationId = req.params.conversationId;
-            const updatedConversation = req.body as updateConversationDto;
-            // check if the conversation is exist
-            const existingConversation = await ConversationRepo.getConversation(conversationId);
-            if (!existingConversation) {
-                throw new NoEntryError(`Conversation not found`);
+            const {userId, ...updateData} = req.body;
+            if(conversationId == null){
+                throw new BadRequestError(`conversationId is required`);
             }
-            if(updatedConversation.type)
-            {
-                throw new BadRequestError(`Type of conversation can not be updated`);
+            if(userId == null){
+                throw new BadRequestError(`userId is required`);
             }
-            if(!updatedConversation.isAdminBlock && !updatedConversation.isSystemBlock)
-            {
-                updatedConversation.blockExpires = null;
-            }
-            const conversation = await ConversationRepo.updateConversation(conversationId, updatedConversation);
-            if (!conversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
+            const conversationMng = new ConversationManagement(conversationId, userId);
+            await conversationMng.evaluateConversationData()
+            const updatedConversation = await conversationMng.updateConversation(updateData);
             return {
-                conversation
+                updatedConversation
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
         }
     }
 
-    static userBlockConversation = async (req: Request, res: Response) => {
+    static adminBlockConversation = async (req: Request, res: Response) => {
         try {
             const conversationId = req.params.conversationId;
             const adminId = req.body.adminId;
             const blockExpires = req.body.blockExpires;
-            if(conversationId == null || adminId == null)
+            if(conversationId == null || adminId == null || blockExpires == null)
             {
-                throw new BadRequestError(`conversationId and adminId are required`);
+                throw new BadRequestError(`conversationId and adminId and blockExpire are required`);
             }
-            // check if the conversation is exist
-            const existingConversation = await ConversationRepo.getConversation(conversationId);
-            if (!existingConversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
-            const blockExpiresDate = new Date(blockExpires);
-            if (isNaN(blockExpiresDate.getTime())) {
-                throw new BadRequestError(`blockExpires is not a valid date`);
-            }
-            if(blockExpiresDate <= new Date())
-            {
-                throw new BadRequestError(`blockExpires must be in the future`);
-            }
-            // check if the user is admin of the conversation
-            const participant = await ParticipantRepo.getParticipantByConversation(adminId, conversationId);
-            console.log(participant)
-            if(!participant){
-                throw new NoEntryError(`Participant not found`);
-            }
-            if(!participant.isAdmin)
-            {
-                throw new ForbiddenError(`You are not admin of the conversation`);
-            }
-            const updatedConversation = {
-                isAdminBlock: true,
-                blockExpires: blockExpires
-            }
-            const conversation = await ConversationRepo.updateConversation(conversationId, updatedConversation);
-            if (!conversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
+            const conversationMng = new ConversationManagement(conversationId, adminId);
+            await conversationMng.evaluateConversationData()
+            const updatedConversation = await conversationMng.adminBlockConversation(blockExpires);
             return {
-                conversation
+                updatedConversation
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
@@ -166,36 +137,17 @@ export class ConversationService {
             {
                 throw new BadRequestError(`conversationId and blockExpires are required`);
             }
-            // check if the conversation is exist
-            const existingConversation = await ConversationRepo.getConversation(conversationId);
-            if (!existingConversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
-            const blockExpiresDate = new Date(blockExpires);
-            if (isNaN(blockExpiresDate.getTime())) {
-                throw new BadRequestError(`blockExpires is not a valid date`);
-            }
-            if(blockExpiresDate <= new Date())
-            {
-                throw new BadRequestError(`blockExpires must be in the future`);
-            }
-            const updatedConversation = {
-                isSystemBlock: true,
-                blockExpires
-            }
-            const conversation = await ConversationRepo.updateConversation(conversationId, updatedConversation);
-            if (!conversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
+            const conversationMng = new ConversationManagement(conversationId);
+            const updatedConversation = await conversationMng.systemAdminBlockConversation(blockExpires)
             return {
-                conversation
+                updatedConversation
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
         }
     }
 
-    static userUnblockConversation = async (req: Request, res: Response) => {
+    static adminUnblockConversation = async (req: Request, res: Response) => {
         try {
             const conversationId = req.params.conversationId;
             const adminId = req.body.adminId;
@@ -203,38 +155,11 @@ export class ConversationService {
             {
                 throw new BadRequestError(`conversationId and adminId are required`);
             }            
-            // check if the user is admin of the conversation
-            const participant = await ParticipantRepo.getParticipantByConversation(adminId, conversationId);
-            if(!participant){
-                throw new NoEntryError(`Participant not found`);
-            }
-            if(!participant.isAdmin)
-            {
-                throw new ForbiddenError(`You are not admin of the conversation`);
-            }
-            // check if the conversation is exist
-            const existingConversation = await ConversationRepo.getConversation(conversationId);
-            if (!existingConversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
-            // check if the conversation is blocked
-            if(!existingConversation.isAdminBlock)
-            {
-                return {
-                    msg: "Conversation is not blocked"
-                }
-            }
-            
-            const updatedConversation = {
-                isAdminBlock: false,
-                blockExpires: existingConversation.isSystemBlock? existingConversation.blockExpires: null
-            }
-            const conversation = await ConversationRepo.updateConversation(conversationId, updatedConversation);
-            if (!conversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
+            const conversationMng = new ConversationManagement(conversationId, adminId);
+            await conversationMng.evaluateConversationData()
+            const updatedConversation = await conversationMng.adminUnblockConversation();
             return {
-                conversation
+                updatedConversation
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
@@ -248,25 +173,10 @@ export class ConversationService {
             {
                 throw new BadRequestError(`conversationId is required`);
             }
-            // check if the conversation is exist
-            const existingConversation = await ConversationRepo.getConversation(conversationId);
-            if (!existingConversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
-            // check if the conversation is blocked
-            if(!existingConversation.isSystemBlock)
-            {
-                return {
-                    msg: "Conversation is not blocked"
-                }
-            }
-            const updatedConversation = {
-                isSystemBlock: false,
-                blockExpires: null
-            }
-            const conversation = await ConversationRepo.updateConversation(conversationId, updatedConversation);
+            const conversationMng = new ConversationManagement(conversationId);
+            const updatedConversation = await conversationMng.systemAdminUnblockConversation()
             return {
-                conversation
+                updatedConversation
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
@@ -278,20 +188,15 @@ export class ConversationService {
             const conversationId = req.params.conversationId;
             const adminId = req.body.adminId;
             // check if the user is admin of the conversation
-            const participant = await ParticipantRepo.getParticipantByConversation(adminId, conversationId);
-            if(!participant){
-                throw new NoEntryError(`Participant not found`);
-            }
-            if(!participant.isAdmin)
+            if(conversationId == null || adminId == null)
             {
-                throw new ForbiddenError(`You are not admin of the conversation`);
+                throw new BadRequestError(`conversationId and adminId are required`);
             }
-            const conversation = await ConversationRepo.deleteConversation(conversationId);
-            if (!conversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
+            const conversationMng = new ConversationManagement(conversationId, adminId);
+            await conversationMng.evaluateConversationData()
+            const conversationDeleted = await conversationMng.adminDeleteConversation();
             return {
-                conversation
+                conversationDeleted
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
@@ -307,36 +212,11 @@ export class ConversationService {
             {
                 throw new BadRequestError(`conversationId, adminId and newAdminId are required`);
             }
-            // check if the conversation is exist
-            const existingConversation = await ConversationRepo.getConversation(conversationId);
-            if (!existingConversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
-            if (existingConversation.type == "PRIVATE") {
-                throw new BadRequestError(`Can not update admin of private conversation`);
-            }
-            // check if the user is admin of the conversation
-            const oldAdmin = await ParticipantRepo.getParticipantByConversation(adminId, conversationId);
-            const newAdmin = await ParticipantRepo.getParticipantByConversation(newAdminId, conversationId);
-            if(!oldAdmin || !newAdmin)
-            {
-                throw new NoEntryError(`Participant not found`);
-            }
-            if(!oldAdmin.isAdmin)
-            {
-                throw new ForbiddenError(`You are not admin of the conversation`);
-            }
-            // set oldadmin to normal participant
-            const updatedOldAdmin = {
-                isAdmin: false
-            }
-            await ParticipantRepo.updateParticipant(adminId, updatedOldAdmin);
-            const updateNewAdmin = {
-                isAdmin: true
-            }
-            await ParticipantRepo.updateParticipant(newAdminId, updateNewAdmin);
+            const conversationMng = new ConversationManagement(conversationId, adminId);
+            await conversationMng.evaluateConversationData()
+            const conversationUpdated = await conversationMng.updateAdminConversation(newAdminId);
             return {
-                conversationUpdated: await ConversationRepo.getDetailConversation(conversationId)
+                conversationUpdated
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
@@ -352,40 +232,54 @@ export class ConversationService {
             {
                 throw new BadRequestError(`conversationId, userId and executorId are required`);
             }
-            // check if the conversation is exist
-            const existingConversation = await ConversationRepo.getConversation(conversationId);
-            if (!existingConversation) {
-                throw new NoEntryError(`Conversation not found`);
-            }
-            // check if the conversation is blocked
-            if(existingConversation.isAdminBlock || existingConversation.isSystemBlock)
-            {
-                throw new ForbiddenError(`Conversation is blocked`);
-            }
-            // check if the executor is admin of the conversation
-            const executor = await ParticipantRepo.getParticipantByConversation(executorId, conversationId);
-            if(!executor)
-            {
-                throw new ForbiddenError(`You are not in the conversation`);
-            }
-            // check if the user is already in the conversation
-            const participant = await ParticipantRepo.getParticipantByConversation(userId, conversationId);
-            if(participant)
-            {
-                throw new BadRequestError(`User is already in the conversation`);
-            }
-             // create conversation Setting for admin
-             const addedUserSetting = await ConversationSettingRepo.create({
-                isAdminSetting: false
-            } as ConversationSettingDto);
-            // join the user to the conversation
-            await ParticipantRepo.addParticipantToConversation(
-                conversationId,
-                userId,
-                addedUserSetting.id
-            );
+            const conversationMng = new ConversationManagement(conversationId, executorId);
+            await conversationMng.evaluateConversationData()
+            const conversationUpdated = await conversationMng.addParticipantToConversation(userId);
             return {
-                conversationUpdated: await ConversationRepo.getDetailConversation(conversationId)
+                conversationUpdated
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static kickMember = async (req: Request, res: Response) => {
+        try {
+            const conversationId = req.params.conversationId;
+            const userId = req.body.userId;
+            const adminId = req.body.adminId;
+            if(conversationId == null || userId == null || adminId == null)
+            {
+                throw new BadRequestError(`conversationId, userId and adminId are required`);
+            }
+            if(userId == adminId)
+            {
+                throw new BadRequestError(`You can't kick yourself`);
+            }
+            const conversationMng = new ConversationManagement(conversationId, adminId);
+            await conversationMng.evaluateConversationData()
+            const conversationUpdated = await conversationMng.kickMember(userId);
+            return {
+                conversationUpdated
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static leaveConversation = async (req: Request, res: Response) => {
+        try {
+            const conversationId = req.params.conversationId;
+            const userId = req.body.userId;
+            if(conversationId == null || userId == null)
+            {
+                throw new BadRequestError(`conversationId and userId are required`);
+            }
+            const conversationMng = new ConversationManagement(conversationId, userId);
+            await conversationMng.evaluateConversationData()
+            const conversationUpdated = await conversationMng.leaveConversation(userId);
+            return {
+                conversationUpdated
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
