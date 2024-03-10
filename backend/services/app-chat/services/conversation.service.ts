@@ -318,7 +318,7 @@ export class ConversationService {
             // check if the user is admin of the conversation
             const oldAdmin = await ParticipantRepo.getParticipantByConversation(adminId, conversationId);
             const newAdmin = await ParticipantRepo.getParticipantByConversation(newAdminId, conversationId);
-            if(oldAdmin == null || newAdmin == null)
+            if(!oldAdmin || !newAdmin)
             {
                 throw new NoEntryError(`Participant not found`);
             }
@@ -334,7 +334,7 @@ export class ConversationService {
             const updateNewAdmin = {
                 isAdmin: true
             }
-            ParticipantRepo.updateParticipant(newAdminId, updateNewAdmin);
+            await ParticipantRepo.updateParticipant(newAdminId, updateNewAdmin);
             return {
                 conversationUpdated: await ConversationRepo.getDetailConversation(conversationId)
             }

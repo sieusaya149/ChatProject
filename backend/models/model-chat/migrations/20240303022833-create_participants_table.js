@@ -37,7 +37,7 @@ module.exports = {
       },
       isBlocked: {
         type: Sequelize.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
         defaultValue: false
       },
       blockExpires: {

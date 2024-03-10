@@ -30,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
         },
         isBlocked: {
           type: DataTypes.BOOLEAN,
-          allowNull: false,
           defaultValue: false
         },
         blockExpires: {

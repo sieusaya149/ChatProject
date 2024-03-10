@@ -45,12 +45,9 @@ export class ParticipantRepo {
         }
     }
     
-    static async updateParticipant(participantId: string, updatedParticipant: updateParticipantDto) {    
+    static async updateParticipant(userId: string, updatedParticipant: updateParticipantDto) {    
         try {
-        const participant = await Participants.findOne({where: {id: participantId}});
-        if (!participant) {
-            throw new Error(`Participant not found`);
-        }
+        const participant = await Participants.findOne({where: {userId: userId}});
         await participant.update(updatedParticipant);
         return participant;
         } catch (error) {
