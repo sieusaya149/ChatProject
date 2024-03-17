@@ -77,5 +77,21 @@ contactRoute.put(
     asyncHandler(ConversationController.unblockParticipant)
 )
 
+contactRoute.get(
+    '/conversation/setting/:conversationId',
+    asyncHandler(ConversationController.getConversationSetting)
+)
+
+contactRoute.put(
+    '/conversation/setting/:conversationId',
+    asyncHandler(ConversationController.updateConversationSetting)
+)
+
+contactRoute.put(
+    '/conversation/reset-setting/:conversationId',
+    asyncHandler(ConversationController.resetConversationSetting)
+)
+
+
 
 export default contactRoute;

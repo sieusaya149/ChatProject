@@ -182,6 +182,43 @@ class ConversationController {
         );
         return successRes.send(res);
     }
+
+    static getConversationSetting = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Conversation Setting Success!',
+            await ConversationService.getConversationSetting(req, res)
+        );
+        return successRes.send(res);
+    }
+
+
+    static updateConversationSetting = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Conversation By User Id Success!',
+            await ConversationService.updateConversationSetting(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static resetConversationSetting = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Reset Conversation Setting!',
+            await ConversationService.resetConversationSetting(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default ConversationController;

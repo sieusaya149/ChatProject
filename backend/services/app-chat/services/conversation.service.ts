@@ -369,4 +369,62 @@ export class ConversationService {
             throw new BadRequestError(`${error}`);
         }
     }
+
+    static getConversationSetting = async (req: Request, res: Response) => {
+        try {
+            const conversationId = req.params.conversationId;
+            const userId = req.body.userId;
+            if(conversationId == null || userId == null)
+            {
+                throw new BadRequestError(`conversationId and userId are required`);
+            }
+            const conversationMng = new ConversationManagement(conversationId, userId);
+            await conversationMng.evaluateConversationData()
+            const conversationSetting = await conversationMng.getConversationSetting();
+            return {
+                conversationSetting
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static updateConversationSetting = async (req: Request, res: Response) => {
+        try {
+            const conversationId = req.params.conversationId;
+            const {userId, ...updateData} = req.body;
+            if(conversationId == null || userId == null)
+            {
+                throw new BadRequestError(`conversationId, userId are required`);
+            }
+            const conversationMng = new ConversationManagement(conversationId, userId);
+            await conversationMng.evaluateConversationData()
+            const conversationSettingUpdated = await conversationMng.updateConversationSetting(updateData);
+            return {
+                conversationSettingUpdated
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static resetConversationSetting = async (req: Request, res: Response) => {
+        try {
+            const conversationId = req.params.conversationId;
+            const userId = req.body.userId;
+            if(conversationId == null || userId == null)
+            {
+                throw new BadRequestError(`conversationId, userId are required`);
+            }
+            const conversationMng = new ConversationManagement(conversationId, userId);
+            await conversationMng.evaluateConversationData()
+            const conversationSettingUpdated = await conversationMng.resetConversationSetting();
+            return {
+                conversationSettingUpdated
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
 }

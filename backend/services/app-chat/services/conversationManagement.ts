@@ -75,6 +75,9 @@ export default class ConversationManagement {
     }
 
     async getConversationSetting() {
+        if(this.userConversationSetting) {
+            return this.userConversationSetting;
+        }
         if(!this.checkIfUserIsJoined(this.userId)) {
             throw new Error(`You are not in the conversation`);
         }
@@ -220,6 +223,15 @@ export default class ConversationManagement {
             isAdmin: true
         } as updateParticipantDto
         await ParticipantRepo.updateParticipant(newAdminId, this.conversationId, updateNewAdmin);
+
+        // update setting for new admin
+        const newAdminSetting = await ConversationSettingRepo.update(
+            this.participantData.conversationSettingId,
+            {isAdminSetting: true} as updateConversationSettingDto);
+        // update setting for old admin
+        const oldAdminSetting = await ConversationSettingRepo.update(
+            this.participantData.conversationSettingId,
+            {isAdminSetting: false} as updateConversationSettingDto);
         return await this.getConversationDetail();
     }
 
@@ -337,6 +349,41 @@ export default class ConversationManagement {
         } as updateParticipantDto;
         await participant.update(updatedParticipant);
         return await this.getConversationDetail();
+    }
+
+    async updateConversationSetting(updateData: updateConversationSettingDto) {
+        if ('isAdminSetting' in updateData) {
+            throw new Error(`Can not update isAdminSetting`);
+        }
+        // is it setting of admin
+        if(!this.userConversationSetting.isAdminSetting) {
+            if(updateData.addByAll){
+                throw new Error(`You are not allowed to update addByAll`);
+            }
+        }   
+
+        const conversationSetting = await ConversationSettingRepo.update(
+            this.participantData.conversationSettingId,
+            updateData);
+        return conversationSetting;
+    }
+
+    async resetConversationSetting() {
+        const updateData = {
+            isMuteNotiMessage: null,
+            isMuteNotiMention: null,
+            isMuteNotiJoinGroup: null,
+            isMuteNotiLeaveGroup: null,
+            pinMessage: null,
+            isFavorite: false
+        } as any
+        if(this.userConversationSetting.isAdminSetting) {
+            updateData.addByAll = false;
+        }
+        const conversationSetting = await ConversationSettingRepo.update(
+            this.participantData.conversationSettingId,
+            updateData as updateConversationSettingDto);
+        return conversationSetting;
     }
 }
 
