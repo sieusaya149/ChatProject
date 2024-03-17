@@ -3,6 +3,11 @@ import {asyncHandler} from '@viethung/async-call'
 import ConversationController from '../../controllers/conversation.controller';
 const contactRoute = express.Router();
 
+contactRoute.get(
+    '/conversation/search',
+    asyncHandler(ConversationController.searchConversation)
+)
+
 contactRoute.post(
     '/conversation',
     asyncHandler(ConversationController.createConversation)
@@ -91,6 +96,8 @@ contactRoute.put(
     '/conversation/reset-setting/:conversationId',
     asyncHandler(ConversationController.resetConversationSetting)
 )
+
+
 
 
 

@@ -219,6 +219,18 @@ class ConversationController {
         );
         return successRes.send(res);
     }
+
+    static searchConversation = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Search Conversation Success!',
+            await ConversationService.searchConversation(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default ConversationController;

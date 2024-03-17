@@ -29,7 +29,13 @@ export class ConversationService {
                 }
                 conversationData.joinCode = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             }
+            else if(conversationData.type == "PRIVATE"){
+                if(!contactId){
+                    throw new BadRequestError(`ContactId is required`);
+                }
+            }
             
+            // TODO if group is private name conversation is firstName + lastName of contact
             const newConversation = await ConversationRepo.createConversation(conversationData as ConversationDto);
 
             // create conversation Setting for admin
@@ -421,6 +427,37 @@ export class ConversationService {
             const conversationSettingUpdated = await conversationMng.resetConversationSetting();
             return {
                 conversationSettingUpdated
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static searchConversation = async (req: Request, res: Response) => {
+        try {
+            const { keyword } = req.query;
+            const { userId, limit, page } = req.body;
+            if(userId == null || keyword == null)
+            {
+                throw new BadRequestError(`userId and keyword are required`);
+            }
+            if(limit && page == null)
+            {
+                throw new BadRequestError(`page is required`);
+            }
+            if(page && limit == null)
+            {
+                throw new BadRequestError(`limit is required`);
+            }
+            if (limit && page && (isNaN(limit) || isNaN(page))) {
+                throw new BadRequestError(`Limit and page must be a number`);
+            }
+            if (limit && page && (limit < 1 || page < 1)) {
+                throw new BadRequestError(`Limit and page must be greater than 0`);
+            }
+            const conversationList = await ConversationRepo.searchConversation(userId, keyword as string, limit, page);
+            return {
+                conversationList
             }
         } catch (error) {
             throw new BadRequestError(`${error}`);
