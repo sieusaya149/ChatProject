@@ -25,7 +25,16 @@ export default class ConversationManagement {
 
     constructor(conversationId: string, userId: string = null) {
         this.conversationId = conversationId;
-        this.userId = userId;
+        this.userId = userId; // TODO userId is null some case so we need to check it
+    }
+
+    async playAsAdminNow() {
+        if(this.userId != null) {
+            throw new Error(`You can not play as an admin`);
+        }
+        // base on conversationId to find the admin of the conversation
+        const adminData = await ParticipantRepo.getAdminConversation(this.conversationId);
+        this.userId = adminData.userId;
     }
 
     // get participant data

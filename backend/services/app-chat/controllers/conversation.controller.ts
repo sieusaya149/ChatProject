@@ -231,6 +231,18 @@ class ConversationController {
         );
         return successRes.send(res);
     }
+
+    static joinConversationByCode = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Join Conversation By Code Success!',
+            await ConversationService.joinConversationByCode(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default ConversationController;

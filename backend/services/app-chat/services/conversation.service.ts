@@ -464,4 +464,26 @@ export class ConversationService {
         }
     }
 
+    static joinConversationByCode = async (req: Request, res: Response) => {
+        try {
+            const { joinCode, userId } = req.body;
+            if(joinCode == null || userId == null)
+            {
+                throw new BadRequestError(`joinCode and userId are required`);
+            }
+            // find conversation by token
+            const conversation = await ConversationRepo.getConversationByCode(joinCode);
+            const conversationMng = new ConversationManagement(conversation.id);
+            await conversationMng.playAsAdminNow()
+            await conversationMng.evaluateConversationData()
+            await conversationMng.addParticipantToConversation(userId);
+            const conversationData = await ConversationRepo.getDetailConversation(conversation.id);
+            return {
+                conversationData
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
 }

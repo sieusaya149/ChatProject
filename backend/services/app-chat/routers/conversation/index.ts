@@ -9,6 +9,11 @@ contactRoute.get(
 )
 
 contactRoute.post(
+    '/conversation/join-conversation-by-code',
+    asyncHandler(ConversationController.joinConversationByCode)
+)
+
+contactRoute.post(
     '/conversation',
     asyncHandler(ConversationController.createConversation)
 );
@@ -96,6 +101,7 @@ contactRoute.put(
     '/conversation/reset-setting/:conversationId',
     asyncHandler(ConversationController.resetConversationSetting)
 )
+
 
 
 

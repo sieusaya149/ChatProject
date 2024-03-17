@@ -95,5 +95,19 @@ export class ParticipantRepo {
         }
     }
 
+    static async getAdminConversation(conversationId: string) {
+        try {
+            const admin = await Participants.findOne({
+                where: {
+                    conversationId: conversationId,
+                    isAdmin: true
+                }
+            });
+            return admin;
+        } catch (error) {
+            throw new Error(`${error}`);
+        }
+    }
+
 
 } 

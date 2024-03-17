@@ -164,4 +164,16 @@ export class ConversationRepo {
       throw new Error(`${error}`);
     }
   }
+
+  static async getConversationByCode(joinCode: string) {
+    try {
+      const conversation = await Conversations.findOne({where: {joinCode}});
+      if (!conversation) {
+        throw new Error(`Conversation not found`);
+      }
+      return conversation;
+    } catch (error) {
+      throw new Error(`${error}`);
+    }
+  }
 } 
