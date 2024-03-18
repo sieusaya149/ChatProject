@@ -9,6 +9,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.ENUM('FILE', 'TEXT', 'STICKER'),
             allowNull: false
         },
+        status: {
+            type: DataTypes.ENUM('SENDING', 'DELIVERED'),
+            allowNull: false,
+            defaultValue: 'SENDING'
+        },
         messageIndex: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -21,11 +26,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.BOOLEAN,
             defaultValue: false
         },
-        senderId: {
+        userId: {
             type: DataTypes.UUID,
             allowNull: false
         },
-        isHide: {
+        isUndo: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: false
@@ -33,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
         conversationId: {
             type: DataTypes.UUID,
             allowNull: false
+        },
+        text: {
+            type: DataTypes.TEXT,
+            allowNull: true
         },
         createdAt: {
           type: DataTypes.DATE,
