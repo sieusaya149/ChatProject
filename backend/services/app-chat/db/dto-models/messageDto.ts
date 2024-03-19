@@ -11,6 +11,8 @@ export type MessageDto = {
     parent?: string;
     isForwarded?: boolean;
     isUndo?: boolean;
+    isPin?: boolean;
+    pinAt?: Date;
     text?: string;
     createdAt?: Date;
     updatedAt?: Date;

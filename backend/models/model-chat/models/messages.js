@@ -35,6 +35,15 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: false
         },
+        isPin: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        pinAt: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
         conversationId: {
             type: DataTypes.UUID,
             allowNull: false
