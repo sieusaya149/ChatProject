@@ -243,6 +243,42 @@ class ConversationController {
         );
         return successRes.send(res);
     }
+
+    static getConversationHistory = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Conversation History Success!',
+            await ConversationService.getConversationHistory(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static readConversation = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Read Conversation Success!',
+            await ConversationService.readConversation(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static getUnreadMessages = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Unread Messages Success!',
+            await ConversationService.getUnreadMessages(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default ConversationController;

@@ -29,7 +29,7 @@ export class MessageRepo {
         }
     }
 
-    static async getMessageByConversation(conversationId, userId, limit = null, page = null) {
+    static async getConversationMessages(conversationId, userId, limit = null, page = null) {
         try {
             const options = {
                 where: sequelize.and(
@@ -44,8 +44,6 @@ export class MessageRepo {
                 order: [['createdAt', 'DESC']],
             };
             if (limit !== null && page !== null) {
-                console.log('limit', limit);
-                console.log('page', page);
                 options['limit'] = limit;
                 options['offset'] = limit * (page - 1);
             }
@@ -78,8 +76,6 @@ export class MessageRepo {
                 order: [['pinAt', 'DESC']],
             }
             if (limit !== null && page !== null) {
-                console.log('limit', limit);
-                console.log('page', page);
                 options['limit'] = limit;
                 options['offset'] = limit * (page - 1);
             }
@@ -164,6 +160,44 @@ export class MessageRepo {
                 pinAt: null
             });
             return message;
+        } catch (error) {
+            throw new Error(`${error}`);
+        }
+    }
+
+    static async getUnreadMessages(conversationId, userId, lastestViewedMessageIndex, limit = null , page = null) {
+        try {
+            const whereConditions = [
+                { conversationId: conversationId },
+                { userId: { [Sequelize.Op.ne]: userId } },
+                { isUndo: false },
+                sequelize.where(
+                    sequelize.literal(`"id" NOT IN (SELECT "messageId" FROM "HideMessages" WHERE "userId" = '${userId}')`),
+                    true
+                )
+            ]
+            if(lastestViewedMessageIndex){
+                whereConditions.push({ messageIndex: { [Sequelize.Op.gt]: lastestViewedMessageIndex } } as any);
+            }
+            const options = {
+                where: {
+                    [Sequelize.Op.and]: whereConditions
+                },
+                order: [['createdAt', 'DESC']],
+            }
+            if (limit !== null && page !== null) {
+                options['limit'] = limit;
+                options['offset'] = limit * (page - 1);
+            }
+            const unreadMessages = await Messages.findAll(options);
+            const totalUnreadMessage = await Messages.count(options);
+            return {
+                totalUnreadMessage,
+                limit,
+                currentPage: page,
+                totalPage: Math.ceil(totalUnreadMessage / limit),
+                unreadMessages
+            }
         } catch (error) {
             throw new Error(`${error}`);
         }

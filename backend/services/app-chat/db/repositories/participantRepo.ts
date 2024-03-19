@@ -17,9 +17,9 @@ export class ParticipantRepo {
         }
     }
     
-    static async getParticipant(participantId: string) {
+    static async getParticipantByUserId(userId: string) {
         try {
-        const participant = await Participants.findOne({where: {id: participantId}});
+        const participant = await Participants.findOne({where: {userId}});
         if (!participant) {
             throw new Error(`Participant not found`);
         }
@@ -38,6 +38,9 @@ export class ParticipantRepo {
                 conversationId: conversationId
             }
         });
+        if (!participant) {
+            throw new Error(`Participant not found`);
+        }
         return participant;
         } catch (error) {
         throw new Error(`${error}`);
@@ -104,6 +107,20 @@ export class ParticipantRepo {
                 }
             });
             return admin;
+        } catch (error) {
+            throw new Error(`${error}`);
+        }
+    }
+
+    static async updateLastestViewedMessage(conversationId: string, userId: string, messageIndex: number) {
+        try {
+            const updatedParticipant = await Participants.update({lastestViewedMessageIndex: messageIndex}, {
+                where: {
+                    conversationId: conversationId,
+                    userId: userId
+                }
+            });
+            return updatedParticipant;
         } catch (error) {
             throw new Error(`${error}`);
         }

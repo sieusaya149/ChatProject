@@ -1,109 +1,122 @@
 import express from 'express';
 import {asyncHandler} from '@viethung/async-call'
 import ConversationController from '../../controllers/conversation.controller';
-const contactRoute = express.Router();
+const conversationRoute = express.Router();
 
-contactRoute.get(
+conversationRoute.get(
     '/conversation/search',
     asyncHandler(ConversationController.searchConversation)
 )
 
-contactRoute.post(
+conversationRoute.post(
     '/conversation/join-conversation-by-code',
     asyncHandler(ConversationController.joinConversationByCode)
 )
 
-contactRoute.post(
+conversationRoute.get(
+    '/conversation/unread-messages',
+    asyncHandler(ConversationController.getUnreadMessages)
+);
+
+conversationRoute.post(
     '/conversation',
     asyncHandler(ConversationController.createConversation)
 );
 
-contactRoute.get(
+conversationRoute.get(
     '/conversation/:conversationId',
     asyncHandler(ConversationController.getConversation)
 );
 
-contactRoute.get(
+conversationRoute.get(
     '/conversations/:userId',
     asyncHandler(ConversationController.getConversations)
 );
-contactRoute.put(
+conversationRoute.put(
     '/conversation/:conversationId',
     asyncHandler(ConversationController.updateConversation)
 );
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/admin-block-group/:conversationId',
     asyncHandler(ConversationController.adminBlockConversation)
 );
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/sysadmin-block/:conversationId',
     asyncHandler(ConversationController.systemAdminBlockConversation)
 );
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/admin-unblock-group/:conversationId',
     asyncHandler(ConversationController.adminUnblockConversation)
 );
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/sysadmin-unblock/:conversationId',
     asyncHandler(ConversationController.systemAdminUnblockConversation)
 );
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/change-admin-group/:conversationId',
     asyncHandler(ConversationController.updateAdminConversation)
 );
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/add-participant-group/:conversationId',
     asyncHandler(ConversationController.addParticipant)
 );
 
-contactRoute.delete(
+conversationRoute.delete(
     '/conversation/admin-delete-group/:conversationId',
     asyncHandler(ConversationController.adminDeleteConversation)
 );
 
-contactRoute.post(
+conversationRoute.post(
     '/conversation/kick-member/:conversationId',
     asyncHandler(ConversationController.kickMember)
 );
 
-contactRoute.post(
+conversationRoute.post(
     '/conversation/leave-conversation/:conversationId',
     asyncHandler(ConversationController.leaveConversation)
 );
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/block-participant/:conversationId',
     asyncHandler(ConversationController.blockParticipant)
 )
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/unblock-participant/:conversationId',
     asyncHandler(ConversationController.unblockParticipant)
 )
 
-contactRoute.get(
+conversationRoute.get(
     '/conversation/setting/:conversationId',
     asyncHandler(ConversationController.getConversationSetting)
 )
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/setting/:conversationId',
     asyncHandler(ConversationController.updateConversationSetting)
 )
 
-contactRoute.put(
+conversationRoute.put(
     '/conversation/reset-setting/:conversationId',
     asyncHandler(ConversationController.resetConversationSetting)
 )
 
+conversationRoute.get(
+    '/conversation/history/:conversationId',
+    asyncHandler(ConversationController.getConversationHistory)
+);
+
+conversationRoute.post(
+    '/conversation/read/:conversationId',
+    asyncHandler(ConversationController.readConversation)
+);
 
 
 
-
-export default contactRoute;
+export default conversationRoute;

@@ -11,11 +11,6 @@ messageRoute.post(
 );
 
 messageRoute.get(
-    '/message/history',
-    asyncHandler(MessagingController.getConversationHistory)
-);
-
-messageRoute.get(
     '/message/infor/:messageId',
     asyncHandler(MessagingController.getMessageInfor)
 );

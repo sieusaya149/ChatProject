@@ -88,30 +88,20 @@ export class ConversationRepo {
       };
   
       if (limit !== null && page !== null) {
-        console.log('limit', limit);
-        console.log('page', page);
         options['limit'] = limit;
         options['offset'] = limit * (page - 1);
       }
   
-      const conversation = await Conversations.findAll(options);
+      const conversations = await Conversations.findAll(options);
   
       // get number of conversation
-      const totalConversation = await Conversations.count({
-        include: {
-          model: backendModel.Participants,
-          as: 'participants',
-          where: {
-            userId: userId
-          }
-        }
-      });
+      const totalConversation = await Conversations.count(options);
   
       return {
         totalConversation,
         currentPage: page,
         totalPage: Math.ceil(totalConversation / limit),
-        conversation
+        conversations
       };
     } catch (error) {
       throw new Error(`${error}`);

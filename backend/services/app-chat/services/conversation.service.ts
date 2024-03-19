@@ -17,6 +17,7 @@ import { ConversationSettingRepo } from '../db/repositories/conversationSettingR
 import { ConversationDto, updateConversationDto } from '../db/dto-models/conversationDto';
 import { ConversationSettingDto, updateConversationSettingDto } from '../db/dto-models/conversationSettingDto';
 import ConversationManagement from './conversationManagement';
+import { MessageRepo } from '../db/repositories/messageRepo';
 
 export class ConversationService {
     static createConversation = async (req: Request, res: Response) => {
@@ -312,10 +313,10 @@ export class ConversationService {
                 throw new BadRequestError(`limit is required`);
             }
 
-            if ((isNaN(limit) || isNaN(page))) {
+            if (limit && page && (isNaN(limit) || isNaN(page))) {
                 throw new BadRequestError(`Limit and page must be a number`);
             }
-            if (limit < 1 || page < 1) {
+            if (limit && page && (limit < 1 || page < 1)) {
                 throw new BadRequestError(`Limit and page must be greater than 0`);
             }
             const conversationList = await ConversationRepo.getConversationByUserId(userId, limit, page);
@@ -486,4 +487,128 @@ export class ConversationService {
         }
     }
 
+    static getConversationHistory = async (req: Request, res: Response) => {
+        try {
+            const {userId, limit, page} = req.body;
+            const conversationId = req.params.conversationId;
+            if(conversationId == null)
+            {
+                throw new BadRequestError(`conversationId is required`);
+            }
+            if(userId == null)
+            {
+                throw new BadRequestError(`userId is required`);
+            }
+            // if has limit need page
+            if(limit && page == null)
+            {
+                throw new BadRequestError(`page is required`);
+            }
+            // if has page need limit
+            if(page && limit == null)
+            {
+                throw new BadRequestError(`limit is required`);
+            }
+
+            if (limit && page && (isNaN(limit) || isNaN(page))) {
+                throw new BadRequestError(`Limit and page must be a number`);
+            }
+            if (limit && page && limit < 1 || page < 1) {
+                throw new BadRequestError(`Limit and page must be greater than 0`);
+            }
+            // check if user is in conversation
+            const conversationMng = new ConversationManagement(conversationId);
+            if (!await conversationMng.checkIfUserIsJoined(userId)) {
+                throw new BadRequestError(`You are not in conversation`);
+            }
+            const messages = await MessageRepo.getConversationMessages(conversationId, userId, limit, page)
+            return messages;
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static readConversation = async (req: Request, res: Response) => {
+        try {
+            const {userId} = req.body;
+            const {conversationId} = req.params;
+            if(conversationId == null || userId == null)
+            {
+                throw new BadRequestError(`conversationId and userId are required`);
+            }
+            // check if user is in conversation
+            const conversationMng = new ConversationManagement(conversationId);
+            if (!await conversationMng.checkIfUserIsJoined(userId)) {
+                throw new BadRequestError(`You are not in conversation`);
+            }
+            // get lastest messages of the conversation (not include the message that the user has read)
+            const messages = await MessageRepo.getConversationMessages(conversationId, userId, 1, 1);
+            if(messages.messages.length == 0){
+                return
+            }
+            // update lastIndexRead of the user, this is the lastest message that the user has read
+            await ParticipantRepo.updateLastestViewedMessage(conversationId, userId, messages.messages[0].messageIndex);
+            return
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static getUnreadMessages = async (req: Request, res: Response) => {
+        try {
+            const {conversationId, userId, limit, page} = req.body;
+
+            // if has limit need page
+            if(limit && page == null)
+            {
+                throw new BadRequestError(`page is required`);
+            }
+            // if has page need limit
+            if(page && limit == null)
+            {
+                throw new BadRequestError(`limit is required`);
+            }
+
+            if (limit && page && (isNaN(limit) || isNaN(page))) {
+                throw new BadRequestError(`Limit and page must be a number`);
+            }
+            if (limit && page && (limit < 1 || page < 1)) {
+                throw new BadRequestError(`Limit and page must be greater than 0`);
+            }
+            if(userId == null)
+            {
+                throw new BadRequestError(`userId are required`);
+            }
+            if(conversationId == null)
+            {
+                const conversationData = await ConversationRepo.getConversationByUserId(userId);
+                console.log('conversationData', conversationData);
+                if(conversationData.conversations.length == 0){
+                    return null
+                }
+                
+                const unreadDataPromises = conversationData.conversations.map(async (conversation) => {
+                    const participant = await ParticipantRepo.getParticipantByConversation(userId, conversation.id);
+                    const lastestViewedMessageIndex = participant.lastestViewedMessageIndex;
+                    return await MessageRepo.getUnreadMessages(conversation.id, userId, lastestViewedMessageIndex, limit, page);
+                });
+
+                return await Promise.all(unreadDataPromises);
+            }
+            else {
+                // check if user is in conversation
+                const conversationMng = new ConversationManagement(conversationId);
+                if (!await conversationMng.checkIfUserIsJoined(userId)) {
+                    throw new BadRequestError(`You are not in conversation`);
+                }
+                 // get current lastest message that the user has read
+                const participant = await ParticipantRepo.getParticipantByConversation(userId, conversationId);
+                const lastestViewedMessageIndex = participant.lastestViewedMessageIndex;
+                const unreadData  = await MessageRepo.getUnreadMessages(conversationId, userId, lastestViewedMessageIndex, limit, page);
+                return unreadData
+            }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
 }

@@ -14,18 +14,6 @@ class MessagingController {
         return successRes.send(res);
     };
 
-    static getConversationHistory = async (
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): Promise<Response> => {
-        const successRes = new SuccessResponse(
-            'Get Conversation History Success!',
-            await MessageService.getConversationHistory(req, res)
-        );
-        return successRes.send(res);
-    };
-
     static getMessageInfor = async (
         req: Request,
         res: Response,

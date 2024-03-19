@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING,
           allowNull: true
         },
-        lastViewedMessage: {
+        lastestViewedMessageIndex: {
           type: DataTypes.INTEGER,
           allowNull: true
         },

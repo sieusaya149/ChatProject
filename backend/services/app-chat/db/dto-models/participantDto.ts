@@ -5,7 +5,7 @@ export type participantDto = {
     isAdmin?: boolean;
     joinedDate?: Date;
     nickName?: string;
-    lastViewedMessage?: number;
+    lastestViewedMessageIndex?: number;
     isBlocked?: boolean;
     blockExpires?: Date;
     userId: string;
