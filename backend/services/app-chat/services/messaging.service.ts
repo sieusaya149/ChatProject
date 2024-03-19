@@ -88,15 +88,19 @@ export class MessageService {
             if(!messageId){
                 throw new BadRequestError(`messageId is required`);
             }
+            const message = await MessageRepo.getMessageById(messageId);
+            // check if the user is the owner of the message
+            if(message.userId !== userId){
+                throw new BadRequestError(`You are not the owner of the message`);
+            }
+            // check if the message isUndo or not
+            if(message.isUndo){
+                throw new BadRequestError(`The message has been undo`);
+            }
             // check if the message does not hide
             const hideMessage = await HideMessageRepo.getHideMessage(messageId, userId);
             if(hideMessage){
                 throw new BadRequestError(`The message has been hidden`);
-            }
-            // check if the message isUndo or not
-            const message = await MessageRepo.getMessageById(messageId);
-            if(message.isUndo){
-                throw new BadRequestError(`The message has been undo`);
             }
             return await MessageRepo.undo(messageId);
         } catch (error) {
