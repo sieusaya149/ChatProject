@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             autoIncrement: true,
         },
-        parent: {
+        replyTo: {
             type: DataTypes.UUID,
             allowNull: true
         },
@@ -87,6 +87,12 @@ module.exports = (sequelize, DataTypes) => {
         Messages.hasMany(models.HideMessages, {
             foreignKey: 'messageId',
             as: 'hideMessage',
+        });
+
+        // message can be reply by many other messages
+        Messages.hasMany(models.Messages, {
+            foreignKey: 'replyTo',
+            as: 'reply',
         });
     };
     return Messages;

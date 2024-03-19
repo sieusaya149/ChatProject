@@ -254,4 +254,33 @@ export class MessageService {
             throw new BadRequestError(`${error}`);
         }
     }
+
+    static replyMessage = async (req: Request, res: Response) => {
+        try {
+            const {messageId, userId, conversationId, text} = req.body;
+            if(!messageId || !text){
+                throw new BadRequestError(`messageId, text are required`);
+            }
+            // check if the message does not undo
+            const message = await MessageRepo.getMessageById(messageId);
+            if(message.isUndo){
+                throw new BadRequestError(`The message has been undo`);
+            }
+            // check if the message does not hide
+            const hideMessage = await HideMessageRepo.getHideMessage(messageId, userId);
+            if(hideMessage){
+                throw new BadRequestError(`The message has been hidden`);
+            }
+            const newMessage = {
+                conversationId,
+                userId,
+                type: 'TEXT',
+                text,
+                replyTo: messageId
+            } as MessageDto
+            await MessageRepo.create(newMessage)
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
 } 

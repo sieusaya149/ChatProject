@@ -34,10 +34,9 @@ export class MessageRepo {
             const options = {
                 where: sequelize.and(
                     {conversationId: conversationId},
-                    {userId: {[Sequelize.Op.eq]: userId}},
                     {isUndo: false},
                     sequelize.where(
-                        sequelize.literal(`"id" NOT IN (SELECT "messageId" FROM "HideMessages" WHERE "userId" = '${userId}')`),
+                        sequelize.literal(`"Messages"."id" NOT IN (SELECT "messageId" FROM "HideMessages" WHERE "userId" = '${userId}')`),
                         true
                     )
                 ),
@@ -48,13 +47,21 @@ export class MessageRepo {
                 options['offset'] = limit * (page - 1);
             }
             const messages = await Messages.findAll(options);
+            const fullDetailMessagePrs = messages.map(async (message) => {
+                const options = {
+                    where: {id: message.replyTo}
+                }
+                const replyToMessage = await Messages.findOne(options);
+                return {...message.get({ plain: true }), replyTo: replyToMessage};
+            });
+            const fullDetailMessages = await Promise.all(fullDetailMessagePrs);
             const totalMessage = await Messages.count(options);
             return {
                 totalMessage,
                 limit,
                 currentPage: page,
                 totalPage: limit ? Math.ceil(totalMessage / limit): null,
-                messages,
+                messages: fullDetailMessages,
             }
         } catch (error) {
             throw new Error(`${error}`);

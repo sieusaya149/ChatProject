@@ -50,4 +50,10 @@ messageRoute.get(
     asyncHandler(MessagingController.searchMessages)
 );
 
+messageRoute.post(
+    '/message/reply',
+    asyncHandler(MessagingController.replyMessage)
+);
+
+
 export default messageRoute;

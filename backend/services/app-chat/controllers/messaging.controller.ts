@@ -109,6 +109,18 @@ class MessagingController {
         );
         return successRes.send(res);
     }
+
+    static replyMessage = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Reply Message Success!',
+            await MessageService.replyMessage(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default MessagingController;
