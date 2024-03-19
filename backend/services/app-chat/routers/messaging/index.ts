@@ -20,4 +20,14 @@ messageRoute.get(
     asyncHandler(MessagingController.getMessageInfor)
 );
 
+messageRoute.put(
+    '/message/undo',
+    asyncHandler(MessagingController.undoMessage)
+);
+
+messageRoute.put(
+    '/message/hide',
+    asyncHandler(MessagingController.hideMessage)
+);
+
 export default messageRoute;

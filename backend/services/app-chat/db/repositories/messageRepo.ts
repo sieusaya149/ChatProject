@@ -4,8 +4,7 @@ import backendModel from "@viethung/backend-models-chat";
 import { MessageDto, UpdateMessage } from "../dto-models/messageDto";
 import Logger from "@viethung/logger";
 const Messages = backendModel.Messages;
-const Conversations = backendModel.Conversations;
-
+const HideMessages = backendModel.HideMessages;
 
 export class MessageRepo {
     static async create(newMessage: MessageDto) {
@@ -30,12 +29,17 @@ export class MessageRepo {
         }
     }
 
-    static async getMessageByConversation(conversationId, limit = null, page = null) {
+    static async getMessageByConversation(conversationId, userId, limit = null, page = null) {
         try {
             const options = {
                 where: sequelize.and(
                     {conversationId: conversationId},
-                    {userId: {[Sequelize.Op.ne]: null}},
+                    {userId: {[Sequelize.Op.eq]: userId}},
+                    {isUndo: false},
+                    sequelize.where(
+                        sequelize.literal(`"id" NOT IN (SELECT "messageId" FROM "HideMessages" WHERE "userId" = '${userId}')`),
+                        true
+                    )
                 ),
                 order: [['createdAt', 'DESC']],
             };
@@ -46,7 +50,7 @@ export class MessageRepo {
                 options['offset'] = limit * (page - 1);
             }
             const messages = await Messages.findAll(options);
-            const totalMessages = await Messages.count(options);
+            const totalMessages = messages.length;
 
             return {
                 totalMessages,
@@ -60,7 +64,7 @@ export class MessageRepo {
         }
     }
 
-    static update(messageId: string, updatedMessage: UpdateMessage) {
+    static async update(messageId: string, updatedMessage: UpdateMessage) {
         try {
             const message = Messages.findOne({where: {id: messageId}});
             if (!message) {
@@ -73,9 +77,9 @@ export class MessageRepo {
         }
     }
 
-    static undo(messageId: string) {
+    static async undo(messageId: string) {
         try {
-            const message = Messages.findOne({where: {id: messageId}});
+            const message = await Messages.findOne({where: {id: messageId}});
             if (!message) {
                 throw new Error(`Message not found`);
             }
@@ -86,22 +90,9 @@ export class MessageRepo {
         }
     }
 
-    static hide(messageId: string) {
+    static async delete(messageId: string) {
         try {
-            const message = Messages.findOne({where: {id: messageId}});
-            if (!message) {
-                throw new Error(`Message not found`);
-            }
-            message.update({isHidden: true});
-            return message;
-        } catch (error) {
-            throw new Error(`${error}`);
-        }
-    }
-
-    static delete(messageId: string) {
-        try {
-            const message = Messages.findOne({where: {id: messageId}});
+            const message = await Messages.findOne({where: {id: messageId}});
             if (!message) {
                 throw new Error(`Message not found`);
             }

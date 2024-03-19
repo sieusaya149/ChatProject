@@ -20,3 +20,6 @@ export const tokenInfo = {
 
 export const logDirectory = process.env.LOG_DIR;
 
+export const constant = {
+    KEEP_HIDE_MESSAGE_TIME: 60 * 60 * 24 * 7, // 7 days
+}

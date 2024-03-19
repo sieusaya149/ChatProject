@@ -37,6 +37,30 @@ class MessagingController {
         );
         return successRes.send(res);
     }
+
+    static undoMessage = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Undo Message Success!',
+            await MessageService.undoMessage(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static hideMessage = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Hide Message Success!',
+            await MessageService.hideMessage(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default MessagingController;
