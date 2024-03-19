@@ -18,6 +18,7 @@ import { ConversationDto, updateConversationDto } from '../db/dto-models/convers
 import { ConversationSettingDto, updateConversationSettingDto } from '../db/dto-models/conversationSettingDto';
 import ConversationManagement from './conversationManagement';
 import { MessageRepo } from '../db/repositories/messageRepo';
+import { markUserReadConversation } from '../utils/utils';
 
 export class ConversationService {
     static createConversation = async (req: Request, res: Response) => {
@@ -491,6 +492,7 @@ export class ConversationService {
         try {
             const {userId, limit, page} = req.body;
             const conversationId = req.params.conversationId;
+            await markUserReadConversation(conversationId, userId);
             if(conversationId == null)
             {
                 throw new BadRequestError(`conversationId is required`);
@@ -541,14 +543,7 @@ export class ConversationService {
             if (!await conversationMng.checkIfUserIsJoined(userId)) {
                 throw new BadRequestError(`You are not in conversation`);
             }
-            // get lastest messages of the conversation (not include the message that the user has read)
-            const messages = await MessageRepo.getConversationMessages(conversationId, userId, 1, 1);
-            if(messages.messages.length == 0){
-                return
-            }
-            // update lastIndexRead of the user, this is the lastest message that the user has read
-            await ParticipantRepo.updateLastestViewedMessage(conversationId, userId, messages.messages[0].messageIndex);
-            return
+            await markUserReadConversation(conversationId, userId);
         } catch (error) {
             throw new BadRequestError(`${error}`);
         }

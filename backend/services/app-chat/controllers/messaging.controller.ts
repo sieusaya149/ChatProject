@@ -121,6 +121,18 @@ class MessagingController {
         );
         return successRes.send(res);
     }
+
+    static getMessageReaders = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Message Readers Success!',
+            await MessageService.getMessageReaders(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default MessagingController;

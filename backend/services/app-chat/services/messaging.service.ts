@@ -18,6 +18,7 @@ import { constant } from '../config';
 import { MessageDto, MessageTypeDto } from '../db/dto-models/messageDto';
 import { HideMessageDto } from '../db/dto-models/hideMessageDto';
 import { ParticipantRepo } from '../db/repositories/participantRepo';
+import { markUserReadConversation } from '../utils/utils';
 
 export class MessageService {
     static createMessage = async (req: Request, res: Response) => {
@@ -39,6 +40,7 @@ export class MessageService {
                 type,
                 text
             } as MessageDto)
+            await markUserReadConversation(conversationId, userId);
         } catch (error) {
             throw new BadRequestError(`${error}`);
         }
@@ -46,7 +48,8 @@ export class MessageService {
 
     static getMessageInfor = async (req: Request, res: Response) => {
         try {
-            const {messageId} = req.params;
+            const {messageId, conversationId, userId} = req.params;
+            await markUserReadConversation(conversationId, userId);
             if(!messageId){
                 throw new BadRequestError(`messageId is required`);
             }
@@ -58,7 +61,8 @@ export class MessageService {
 
     static undoMessage = async (req: Request, res: Response) => {
         try {
-            const {messageId, userId} = req.body;
+            const {messageId, userId, conversationId} = req.body;
+            await markUserReadConversation(conversationId, userId);
             if(!messageId){
                 throw new BadRequestError(`messageId is required`);
             }
@@ -85,6 +89,7 @@ export class MessageService {
     static hideMessage = async (req: Request, res: Response) => {
         try {
             const {messageId, userId, conversationId} = req.body;
+            await markUserReadConversation(conversationId, userId);
             if(!messageId){
                 throw new BadRequestError(`messageId is required`);
             }
@@ -117,6 +122,7 @@ export class MessageService {
     static pinMessage = async (req: Request, res: Response) => {
         try {
             const {messageId, userId, conversationId} = req.body;
+            await markUserReadConversation(conversationId, userId);
             if(!messageId){
                 throw new BadRequestError(`messageId is required`);
             }
@@ -144,6 +150,7 @@ export class MessageService {
     static unPinMessage = async (req: Request, res: Response) => {
         try {
             const {messageId, userId, conversationId} = req.body;
+            await markUserReadConversation(conversationId, userId);
             if(!messageId){
                 throw new BadRequestError(`messageId is required`);
             }
@@ -171,6 +178,7 @@ export class MessageService {
         try {
             const {conversationId, userId,
                 limit, page} = req.body;
+            await markUserReadConversation(conversationId, userId);
             // if has limit need page
             if(limit && page == null)
             {
@@ -197,6 +205,7 @@ export class MessageService {
     static forwardMessage = async (req: Request, res: Response) => {
         try {
             const {messageId, userId, conversationId, toConversationId} = req.body;
+            await markUserReadConversation(conversationId, userId);
             if(!messageId || !toConversationId){
                 throw new BadRequestError(`messageId, toConversationId are required`);
             }
@@ -229,6 +238,7 @@ export class MessageService {
         try {
             const {keyword} = req.query;
             const {conversationId, userId, limit, page} = req.body;
+            await markUserReadConversation(conversationId, userId);
             if(!keyword){
                 throw new BadRequestError(`keyword is required`);
             }
@@ -258,6 +268,7 @@ export class MessageService {
     static replyMessage = async (req: Request, res: Response) => {
         try {
             const {messageId, userId, conversationId, text} = req.body;
+            await markUserReadConversation(conversationId, userId);
             if(!messageId || !text){
                 throw new BadRequestError(`messageId, text are required`);
             }
@@ -279,6 +290,53 @@ export class MessageService {
                 replyTo: messageId
             } as MessageDto
             await MessageRepo.create(newMessage)
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static getMessageReaders = async (req: Request, res: Response) => {
+        try {
+            const {userId, conversationId} = req.body;
+            let messageId = req.query.messageId;
+            let message = null
+            if(!messageId){ // get the lastest message of the conversation
+                console.log("get the lastest message of the conversation")
+                const messageData = await MessageRepo.getConversationMessages(conversationId, userId, 1, 1);
+                message = messageData.messages[0];
+            }
+            else {
+                message = await MessageRepo.getMessageById(messageId as string);
+            }
+            if(!message){
+                throw new BadRequestError(`No message found`);
+            }
+            // check if message is not undo
+            if(message.isUndo){
+                throw new BadRequestError(`The message has been undo`);
+            }
+            // check if message is not hide
+            const hideMessage = await HideMessageRepo.getHideMessage(userId, message.id);
+            if(hideMessage){
+                throw new BadRequestError(`The message has been hidden`);
+            }
+            const messageIndex = message.messageIndex
+            // get participants of the conversation
+            const participants = await ParticipantRepo.getAllParticipants(conversationId);
+            const messageReaders = participants.filter((participant) => {
+                console.log("particapant id", participant.userId)
+                console.log("particapant index", participant.lastestViewedMessageIndex)
+                console.log("message index", messageIndex)
+                // check if the participant is not the owner of the message and not the current viewer
+                if(participant.userId !== message.userId && participant.userId !== userId){
+                    if(participant.lastestViewedMessageIndex >= messageIndex){
+                        return participant
+                    }
+                }}
+            );
+            return {
+                readers: messageReaders
+            }
         } catch (error) {
             throw new BadRequestError(`${error}`);
         }

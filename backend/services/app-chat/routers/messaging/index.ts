@@ -55,5 +55,10 @@ messageRoute.post(
     asyncHandler(MessagingController.replyMessage)
 );
 
+messageRoute.get(
+    '/message/readers',
+    asyncHandler(MessagingController.getMessageReaders)
+);
+
 
 export default messageRoute;

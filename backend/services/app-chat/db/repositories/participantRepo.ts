@@ -16,6 +16,15 @@ export class ParticipantRepo {
         throw new Error(`${error}`);
         }
     }
+
+    static async getAllParticipants(conversationId) {
+        try {
+            const participants = await Participants.findAll({where: {conversationId}});
+            return participants;
+        } catch (error) {
+            throw new Error(`${error}`);
+        }
+    }
     
     static async getParticipantByUserId(userId: string) {
         try {
@@ -114,13 +123,23 @@ export class ParticipantRepo {
 
     static async updateLastestViewedMessage(conversationId: string, userId: string, messageIndex: number) {
         try {
-            const updatedParticipant = await Participants.update({lastestViewedMessageIndex: messageIndex}, {
+            // check if the current participant has lastestViewedMessageIndex > messageIndex
+            const participant = await Participants.findOne({
                 where: {
                     conversationId: conversationId,
                     userId: userId
                 }
             });
-            return updatedParticipant;
+            if(participant.lastestViewedMessageIndex >= messageIndex){
+                console.log("No need to update lastestViewedMessageIndex")
+                return;
+            }
+            await Participants.update({lastestViewedMessageIndex: messageIndex}, {
+                where: {
+                    conversationId: conversationId,
+                    userId: userId
+                }
+            });
         } catch (error) {
             throw new Error(`${error}`);
         }
