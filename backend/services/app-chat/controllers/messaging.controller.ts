@@ -61,6 +61,42 @@ class MessagingController {
         );
         return successRes.send(res);
     }
+
+    static pinMessage = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Pin Message Success!',
+            await MessageService.pinMessage(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static unPinMessage = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Unpin Message Success!',
+            await MessageService.unPinMessage(req, res)
+        );
+        return successRes.send(res);
+    }
+
+    static getPinMessages = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Pin Messages Success!',
+            await MessageService.getPinMessages(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default MessagingController;

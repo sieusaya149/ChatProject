@@ -30,4 +30,19 @@ messageRoute.put(
     asyncHandler(MessagingController.hideMessage)
 );
 
+messageRoute.post(
+    '/message/pin',
+    asyncHandler(MessagingController.pinMessage)
+);
+
+messageRoute.put(
+    '/message/unpin',
+    asyncHandler(MessagingController.unPinMessage)
+);
+
+messageRoute.get(
+    '/message/pins',
+    asyncHandler(MessagingController.getPinMessages)
+);
+
 export default messageRoute;
