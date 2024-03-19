@@ -25,6 +25,18 @@ class MessagingController {
         );
         return successRes.send(res);
     };
+
+    static getMessageInfor = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Get Message Information Success!',
+            await MessageService.getMessageInfor(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default MessagingController;

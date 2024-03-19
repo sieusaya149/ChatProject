@@ -28,6 +28,7 @@ export class MessageService {
             if(type == 'TEXT' && !text){
                 throw new BadRequestError(`text is required`);
             }
+            // TODO notify the participants of the conversation
             await MessageRepo.create({
                 conversationId,
                 userId,
@@ -61,6 +62,18 @@ export class MessageService {
                 throw new BadRequestError(`Limit and page must be greater than 0`);
             }
             return await MessageRepo.getMessageByConversation(conversationId, limit, page)
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static getMessageInfor = async (req: Request, res: Response) => {
+        try {
+            const {messageId} = req.params;
+            if(!messageId){
+                throw new BadRequestError(`messageId is required`);
+            }
+            return await MessageRepo.getMessageById(messageId);
         } catch (error) {
             throw new BadRequestError(`${error}`);
         }

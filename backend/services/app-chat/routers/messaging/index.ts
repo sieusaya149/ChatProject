@@ -15,4 +15,9 @@ messageRoute.get(
     asyncHandler(MessagingController.getConversationHistory)
 );
 
+messageRoute.get(
+    '/message/infor/:messageId',
+    asyncHandler(MessagingController.getMessageInfor)
+);
+
 export default messageRoute;
