@@ -60,5 +60,10 @@ messageRoute.get(
     asyncHandler(MessagingController.getMessageReaders)
 );
 
+messageRoute.post(
+    '/message/mention',
+    asyncHandler(MessagingController.createMentionMessage)
+);
+
 
 export default messageRoute;

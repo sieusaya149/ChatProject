@@ -3,9 +3,10 @@ import Sequelize from 'sequelize';
 import backendModel from "@viethung/backend-models-chat";
 import { MessageDto, UpdateMessage } from "../dto-models/messageDto";
 import Logger from "@viethung/logger";
+import { UserMessageMentionRepo } from "./userMessageMentionRepo";
 const Messages = backendModel.Messages;
 const HideMessages = backendModel.HideMessages;
-
+const UserMessageMentions = backendModel.UserMessageMentions;
 export class MessageRepo {
     static async create(newMessage: MessageDto) {
         try {
@@ -49,10 +50,23 @@ export class MessageRepo {
             const messages = await Messages.findAll(options);
             const fullDetailMessagePrs = messages.map(async (message) => {
                 const options = {
-                    where: {id: message.replyTo}
-                }
+                  where: { id: message.replyTo },
+                };
                 const replyToMessage = await Messages.findOne(options);
-                return {...message.get({ plain: true }), replyTo: replyToMessage};
+                const mentionUsers = await UserMessageMentions.findAll({
+                  where: { messageId: message.id },
+                });
+                const detailMessages = mentionUsers
+                  ? {
+                      ...message.get({ plain: true }),
+                      replyTo: replyToMessage,
+                      mentionUsers: mentionUsers.map((mention) => mention.userId),
+                    }
+                  : {
+                      ...message.get({ plain: true }),
+                      replyTo: replyToMessage,
+                    };
+                return detailMessages;
             });
             const fullDetailMessages = await Promise.all(fullDetailMessagePrs);
             const totalMessage = await Messages.count(options);

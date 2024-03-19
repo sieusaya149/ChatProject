@@ -19,6 +19,7 @@ import { MessageDto, MessageTypeDto } from '../db/dto-models/messageDto';
 import { HideMessageDto } from '../db/dto-models/hideMessageDto';
 import { ParticipantRepo } from '../db/repositories/participantRepo';
 import { markUserReadConversation } from '../utils/utils';
+import { UserMessageMentionRepo } from '../db/repositories/userMessageMentionRepo';
 
 export class MessageService {
     static createMessage = async (req: Request, res: Response) => {
@@ -324,9 +325,6 @@ export class MessageService {
             // get participants of the conversation
             const participants = await ParticipantRepo.getAllParticipants(conversationId);
             const messageReaders = participants.filter((participant) => {
-                console.log("particapant id", participant.userId)
-                console.log("particapant index", participant.lastestViewedMessageIndex)
-                console.log("message index", messageIndex)
                 // check if the participant is not the owner of the message and not the current viewer
                 if(participant.userId !== message.userId && participant.userId !== userId){
                     if(participant.lastestViewedMessageIndex >= messageIndex){
@@ -337,6 +335,52 @@ export class MessageService {
             return {
                 readers: messageReaders
             }
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
+
+    static async createMentionMessage(req: Request, res: Response) {
+        try {
+            const {conversationId, 
+                   userId,
+                   type, text, mentionUserIds } = req.body;
+            if(type == 'TEXT' && !text){
+                throw new BadRequestError(`text is required`);
+            }
+            if(!mentionUserIds){
+                throw new BadRequestError(`mentionUserIds is required`);
+            }
+            // TODO notify the participants of the conversation
+            const newMessage = await MessageRepo.create({
+                conversationId,
+                userId,
+                type,
+                text
+            } as MessageDto)
+            if(!newMessage) {
+                throw new BadRequestError(`Create message failed`);
+            }
+            // can not mention yourself
+            if(mentionUserIds.includes(userId)){
+                throw new BadRequestError(`You can not mention yourself`);
+            }
+            // check if mentionUserIds are participants of the conversation
+            const participants = await ParticipantRepo.getAllParticipants(conversationId);
+            const participantIds = participants.map((participant) => participant.userId);
+            const notParticipantIds = mentionUserIds.filter((mentionUserId) => !participantIds.includes(mentionUserId));
+            if(notParticipantIds.length > 0){
+                throw new BadRequestError(`The mentionUserIds are not participants of the conversation`);
+            }
+            // create mention message
+            const mentionMessagePr = mentionUserIds.map(async (mentionUserId) => {
+                await UserMessageMentionRepo.create({
+                    userId: mentionUserId,
+                    messageId: newMessage.id
+                })
+            });
+            await Promise.all(mentionMessagePr);
+            await markUserReadConversation(conversationId, userId);
         } catch (error) {
             throw new BadRequestError(`${error}`);
         }

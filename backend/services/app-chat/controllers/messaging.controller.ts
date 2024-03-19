@@ -133,6 +133,18 @@ class MessagingController {
         );
         return successRes.send(res);
     }
+
+    static createMentionMessage = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Create Mention Message Success!',
+            await MessageService.createMentionMessage(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default MessagingController;
