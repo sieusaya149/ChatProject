@@ -40,4 +40,9 @@ messageRoute.get(
     asyncHandler(MessagingController.getPinMessages)
 );
 
+messageRoute.get(
+    '/message/forward',
+    asyncHandler(MessagingController.forwardMessage)
+);
+
 export default messageRoute;

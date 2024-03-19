@@ -85,6 +85,18 @@ class MessagingController {
         );
         return successRes.send(res);
     }
+
+    static forwardMessage = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Forward Message Success!',
+            await MessageService.forwardMessage(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default MessagingController;

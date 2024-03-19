@@ -193,4 +193,35 @@ export class MessageService {
             throw new BadRequestError(`${error}`);
         }
     }
+
+    static forwardMessage = async (req: Request, res: Response) => {
+        try {
+            const {messageId, userId, conversationId, toConversationId} = req.body;
+            if(!messageId || !toConversationId){
+                throw new BadRequestError(`messageId, toConversationId are required`);
+            }
+            // check if the message does not undo
+            const message = await MessageRepo.getMessageById(messageId);
+            if(message.isUndo){
+                throw new BadRequestError(`The message has been undo`);
+            }
+            // check if the message does not hide
+            const hideMessage = await HideMessageRepo.getHideMessage(messageId, userId);
+            if(hideMessage){
+                throw new BadRequestError(`The message has been hidden`);
+            }
+
+            // check if user is a participant of toConversationId
+            const participant = await ParticipantRepo.getParticipantByConversation(userId, toConversationId);
+            const newMessage = {
+                conversationId: toConversationId,
+                userId,
+                type: message.type,
+                text: message.text
+            } as MessageDto
+            await MessageRepo.create(newMessage)
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
 } 
