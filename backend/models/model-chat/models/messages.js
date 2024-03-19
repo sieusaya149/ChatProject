@@ -74,6 +74,11 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'messageId',
             as: 'deletedMessage',
         });
+
+        Messages.hasMany(models.HideMessages, {
+            foreignKey: 'messageId',
+            as: 'hideMessage',
+        });
     };
     return Messages;
 }
