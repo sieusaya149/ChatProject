@@ -100,7 +100,7 @@ export class ConversationRepo {
       return {
         totalConversation,
         currentPage: page,
-        totalPage: Math.ceil(totalConversation / limit),
+        totalPage: limit ? Math.ceil(totalConversation / limit): null,
         conversations
       };
     } catch (error) {
@@ -147,7 +147,7 @@ export class ConversationRepo {
       return {
         totalConversation,
         currentPage: page,
-        totalPage: Math.ceil(totalConversation / limit),
+        totalPage: limit ? Math.ceil(totalConversation / limit): null,
         conversation
       };
     } catch (error) {

@@ -45,4 +45,9 @@ messageRoute.get(
     asyncHandler(MessagingController.forwardMessage)
 );
 
+messageRoute.get(
+    '/message/search',
+    asyncHandler(MessagingController.searchMessages)
+);
+
 export default messageRoute;

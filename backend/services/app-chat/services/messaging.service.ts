@@ -224,4 +224,34 @@ export class MessageService {
             throw new BadRequestError(`${error}`);
         }
     }
+
+    static searchMessages = async (req: Request, res: Response) => {
+        try {
+            const {keyword} = req.query;
+            const {conversationId, userId, limit, page} = req.body;
+            if(!keyword){
+                throw new BadRequestError(`keyword is required`);
+            }
+            // if has limit need page
+            if(limit && page == null)
+            {
+                throw new BadRequestError(`page is required`);
+            }
+            // if has page need limit
+            if(page && limit == null)
+            {
+                throw new BadRequestError(`limit is required`);
+            }
+
+            if (limit && page && (isNaN(limit) || isNaN(page))) {
+                throw new BadRequestError(`Limit and page must be a number`);
+            }
+            if (limit && page && limit < 1 || page < 1) {
+                throw new BadRequestError(`Limit and page must be greater than 0`);
+            }
+            return await MessageRepo.searchMessages(conversationId, userId, keyword, limit, page)
+        } catch (error) {
+            throw new BadRequestError(`${error}`);
+        }
+    }
 } 

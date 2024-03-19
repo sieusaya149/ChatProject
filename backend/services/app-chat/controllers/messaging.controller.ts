@@ -97,6 +97,18 @@ class MessagingController {
         );
         return successRes.send(res);
     }
+
+    static searchMessages = async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response> => {
+        const successRes = new SuccessResponse(
+            'Search Message Success!',
+            await MessageService.searchMessages(req, res)
+        );
+        return successRes.send(res);
+    }
 }
 
 export default MessagingController;

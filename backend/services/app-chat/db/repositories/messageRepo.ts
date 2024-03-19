@@ -53,7 +53,7 @@ export class MessageRepo {
                 totalMessage,
                 limit,
                 currentPage: page,
-                totalPage: Math.ceil(totalMessage / limit),
+                totalPage: limit ? Math.ceil(totalMessage / limit): null,
                 messages,
             }
         } catch (error) {
@@ -85,7 +85,7 @@ export class MessageRepo {
                 totalPin,
                 limit,
                 currentPage: page,
-                totalPage: Math.ceil(totalPin / limit),
+                totalPage: limit ? Math.ceil(totalPin / limit): null,
                 pinMessages,
             }
         } catch (error) {
@@ -195,8 +195,41 @@ export class MessageRepo {
                 totalUnreadMessage,
                 limit,
                 currentPage: page,
-                totalPage: Math.ceil(totalUnreadMessage / limit),
+                totalPage: limit ? Math.ceil(totalUnreadMessage / limit): null,
                 unreadMessages
+            }
+        } catch (error) {
+            throw new Error(`${error}`);
+        }
+    }
+
+    static async searchMessages(conversationId, userId, keyword, limit = null, page = null) {
+        try {
+            const options = {
+                where: sequelize.and(
+                    {conversationId: conversationId},
+                    {userId: {[Sequelize.Op.eq]: userId}},
+                    {isUndo: false},
+                    {text: {[Sequelize.Op.iLike]: `%${keyword}%`}},
+                    sequelize.where(
+                        sequelize.literal(`"id" NOT IN (SELECT "messageId" FROM "HideMessages" WHERE "userId" = '${userId}')`),
+                        true
+                    )
+                ),
+                order: [['createdAt', 'ASC']],
+            }
+            if (limit !== null && page !== null) {
+                options['limit'] = limit;
+                options['offset'] = limit * (page - 1);
+            }
+            const searchMessages = await Messages.findAll(options);
+            const totalSearchMessage = await Messages.count(options);
+            return {
+                totalSearchMessage,
+                limit,
+                currentPage: page,
+                totalPage: limit ? Math.ceil(totalSearchMessage / limit): null,
+                searchMessages
             }
         } catch (error) {
             throw new Error(`${error}`);
