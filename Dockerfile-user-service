@@ -21,6 +21,7 @@ ENV DATABASE_USER_USERNAME=hunghoang
 ENV DATABASE_USER_PASSWORD=hunghoang
 ENV DATABASE_USER_HOST=database
 ENV DATABASE_USER_PORT=5432
+ENV USER_PORT=4002
 # create a directory for the services and models
 RUN mkdir -p ${SOURCE_PATH}
 RUN mkdir -p ${SERVICE_PATH} ${MODEL_PATH} ${LIB_PATH}

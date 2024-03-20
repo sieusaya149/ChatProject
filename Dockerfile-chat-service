@@ -21,7 +21,7 @@ ENV DATABASE_CHAT_USERNAME=hunghoang
 ENV DATABASE_CHAT_PASSWORD=hunghoang
 ENV DATABASE_CHAT_HOST=database
 ENV DATABASE_CHAT_PORT=5432
-
+ENV CHAT_PORT=4004
 
 # create a directory for the services and models
 RUN mkdir -p ${SOURCE_PATH}
