@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+    user-service:
+        build:
+            context: .
+            dockerfile: ./Dockerfile-user-service
+        ports:
+            - ${USER_SERVICE_PORT}:${USER_SERVICE_PORT}
+        container_name: user-service
+        volumes:
+            - ./backend/services/app-user:/app/backend/services/app-user
+            - ./backend/models/model-users:/app/backend/models/model-users
+        depends_on:
+            - database
+        networks:
+            zalo_network:
+                aliases:
+                    - user-service
+        command: |
+          sh -c "
+            sleep 30 &&
+            cd /app/backend/models/model-users && npm run migrate &&
+            cd /app/backend/services/app-user && npm run dev
+          "
+        restart: always
+
+    chat-service:
+        build:
+            context: .
+            dockerfile: ./Dockerfile-chat-service
+        ports:
+            - ${CHAT_SERVICE_PORT}:${CHAT_SERVICE_PORT}
+        container_name: chat-service
+        volumes:
+            - ./backend/services/app-chat:/app/backend/services/app-chat
+            - ./backend/models/model-chat:/app/backend/models/model-chat
+        depends_on:
+            - database
+        networks:
+            zalo_network:
+                aliases:
+                    - chat-service
+        command: |
+          sh -c "
+            sleep 30 &&
+            cd /app/backend/models/model-chat && npm run migrate &&
+            cd /app/backend/services/app-chat && npm run dev
+          "
+        restart: always
+
+    database:
+        build:
+            context: .
+            dockerfile: ./Dockerfile-database
+        container_name: database
+        environment:
+            POSTGRES_USER: hunghoang
+            POSTGRES_PASSWORD: hunghoang
+        ports:
+        - ${DATABASE_OUT_PORT}:${DATABASE_IN_PORT}
+        volumes:
+        - database_data:/var/lib/postgresql/data
+        networks:
+            zalo_network:
+                aliases:
+                - database
+
+networks:
+    zalo_network:
+        driver: bridge
+
+volumes:
+    database_data:
+        driver: local
+        driver_opts:
+            type: 'none'
+            o: 'bind'
+            device: './database-data'

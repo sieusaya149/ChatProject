@@ -12,3 +12,9 @@
 **/data/
 **/data2/
 yarn.lock
+**/chat-data/
+**/user-data/
+**/database-data/
+.env
+**/.env
+setup.md

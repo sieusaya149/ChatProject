@@ -1,0 +1,65 @@
+# Dockerfile for app-user services
+FROM node:18
+
+WORKDIR /app
+
+# export env
+ENV SOURCE_PATH=./backend
+ENV MODEL_PATH=./backend/models
+ENV SERVICE_PATH=./backend/services
+ENV LIB_PATH=./backend/lib
+ENV USER_MODEL_PATH=./backend/models/model-users
+ENV CHAT_MODEL_PATH=./backend/models/model-chat
+ENV USER_SERVICE_PATH=./backend/services/app-user
+ENV CHAT_SERVICE_PATH=./backend/services/app-chat
+ENV LIB_API_RESPONSE=./backend/lib/apiResponse
+ENV LIB_ASYNC_CALL=./backend/lib/asyncCall
+ENV LIB_LOGGER=./backend/lib/logger
+ENV DB_DIALECT=postgres
+ENV DATABASE_USER_NAME=user-service
+ENV DATABASE_USER_USERNAME=hunghoang
+ENV DATABASE_USER_PASSWORD=hunghoang
+ENV DATABASE_USER_HOST=database
+ENV DATABASE_USER_PORT=5432
+# create a directory for the services and models
+RUN mkdir -p ${SOURCE_PATH}
+RUN mkdir -p ${SERVICE_PATH} ${MODEL_PATH} ${LIB_PATH}
+RUN mkdir -p ${USER_SERVICE_PATH} ${USER_MODEL_PATH}
+
+# copy lib
+COPY ${LIB_PATH} ${LIB_PATH}
+
+# copy the package.json and source code of user services to services directory
+RUN echo ${SOURCE_PATH}
+COPY ${SOURCE_PATH}/tsconfig.common.json ${SOURCE_PATH}
+COPY ${USER_SERVICE_PATH} ${USER_SERVICE_PATH}
+
+# copy the package.json and source code of model to models directory
+COPY ${USER_MODEL_PATH} ${USER_MODEL_PATH}
+
+# setup workspace for the services
+COPY package.json .
+RUN yarn
+
+# build lib
+RUN chmod 777 ${LIB_API_RESPONSE}
+RUN chmod 777 ${LIB_ASYNC_CALL}
+RUN chmod 777 ${LIB_LOGGER}
+
+RUN cd ${LIB_API_RESPONSE} && rm -rf build && yarn && cd -
+
+RUN cd ${LIB_ASYNC_CALL} && rm -rf build && yarn && cd -
+
+RUN cd ${LIB_LOGGER} && rm -rf build && yarn && cd -
+
+# install model
+RUN cd ${USER_MODEL_PATH} && yarn
+
+# install the services
+RUN cd ${USER_SERVICE_PATH} && yarn
+
+WORKDIR ${USER_SERVICE_PATH}
+
+EXPOSE 4004
+
+CMD [ "npm", "run", "dev" ]

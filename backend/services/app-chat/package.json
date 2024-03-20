@@ -6,7 +6,7 @@
 	"author": "Hoang Viet Hoang",
 	"private": true,
 	"scripts": {
-		"dev": "ts-node server.ts",
+		"dev": "nodemon server.ts",
 		"build": "rimraf ./build && tsc -p tsconfig.json"
 	},
 	"engines": {
@@ -28,7 +28,7 @@
 		"@types/node": "^20.10.5",
 		"@types/uuid": "^9.0.8",
 		"dotenv": "^16.3.1",
-		"nodemon": "^1.15.0",
+		"nodemon": "^3.1.0",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.3.3"
 	},
